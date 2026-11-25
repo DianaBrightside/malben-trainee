@@ -506,6 +506,29 @@ const CASHIER = { title: { en: "Cashier", he: "קופה" },
       ] }
   ] };
 
+const OPENING_WEIZMAN = [
+  { title: { en: "Display case (vitrina)", he: "ויטרינה" },
+    fifo: true,
+    items: [
+      { en: "<b>Fill the vitrina.</b> Take all of yesterday's products out of the fridge and put them in the vitrina. Leave room for the new products.", he: "<b>מילוי ויטרינה.</b> מוציאים מהמקרר את כל המוצרים מאתמול וממלאים בוויטרינה. משאירים מקום למוצרים החדשים." },
+      { en: "<b>Bring what's missing.</b> Go to the patisserie (קונדיטוריה) and bring the missing products from the fridge.", he: "<b>הוצאת מוצרי ויטרינה.</b> הולכים לקונדיטוריה ומביאים חוסרים מהמקרר.",
+        sub: [ TODO("To add: how to find each product, where it is in the fridge, what gets piped and how", "להוסיף: איך מוצאים כל מוצר, מאיפה לוקחים מהמקרר, מה מזלפים ואיך") ] },
+      { en: "<b>Arrange pastries and sandwiches by FIFO.</b> Put the new products (from the inside fridge or the patisserie) at the front. Yesterday's products stay closest to us, the new ones closest to the customers. Keep everything straight and neat.", he: "<b>סידור מאפים וכריכים לפי FIFO.</b> את החוסרים (ממקרר פנימי או מהקונדיטוריה) מסדרים מקדימה. המוצרים מאתמול מוצגים הכי קרוב אלינו, והחדשים הכי קרוב ללקוחות. כמובן לסדר הכול ישר ואסתטי." },
+      { rule: true, en: "", he: "", a: { en: "Closest to us", he: "הכי קרוב אלינו" }, b: { en: "Closest to customers", he: "הכי קרוב ללקוחות" } },
+      { en: "<b>Check how it looks.</b> Go outside and look at the vitrina from the front. Make sure all the signs are in place and everything looks clean and tidy.", he: "<b>בדיקת נראות.</b> יוצאים להסתכל על הוויטרינה מבחוץ. מוודאים שכל השלטים במקומם והכול נראה נקי ומסודר." }
+    ] },
+  { title: { en: "Prepare the station", he: "הכנת העמדה" },
+    items: [
+      { en: "Turn on the toaster.", he: "להדליק את הטוסטר." },
+      { en: "Take the olives out of the fridge.", he: "להוציא זיתים מהמקרר." },
+      { en: "Make sure there's a cutting board, a knife and tongs.", he: "לוודא שיש קרש חיתוך, סכין ומלקחיים." }
+    ] },
+  { title: { en: "Products from the kitchen window", he: "הורדת מוצרים מהחלון" },
+    items: [
+      { en: "During opening, the kitchen puts products on the window. Take each product down right away and put it in its place.", he: "במהלך הפתיחה המטבח שם מוצרים על החלון. מורידים מיד כל מוצר מהחלון ומסדרים אותו במקומו." }
+    ] }
+];
+
 const OPENING_K50 = [
   { title: { en: "Arrive", he: "הגעה" },
     items: [
@@ -596,6 +619,7 @@ const BRANCHES = [
       { day: { en: "Sat", he: "שבת" }, time: "08:00–15:00" }
     ] },
   { name: { en: "Weizman 51", he: "ויצמן 51" }, ...BRANCH_TEMPLATE(),
+    opening: OPENING_WEIZMAN,
     address: { en: "Weizman 51, Givatayim", he: "ויצמן 51, גבעתיים" },
     hours: [
       { day: { en: "Sun–Thu", he: "א׳–ה׳" }, time: "07:30–18:00" },
