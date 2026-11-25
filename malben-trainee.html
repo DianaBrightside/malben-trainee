@@ -221,7 +221,6 @@ const UI = {
   fan: { en: "Fan", he: "מאוורר" },
   howMany: { en: "How many to bake", he: "כמה לאפות" },
   panel: { en: "Oven buttons", he: "כפתורי התנור" },
-  useProgram: { en: "Baking with a saved program", he: "אפייה עם תוכנית שמורה" },
   bakeTime: { en: "Bake", he: "אפייה" },
   finish: { en: "Finish", he: "גימור" },
   ingredients: { en: "Ingredients", he: "מרכיבים" },
@@ -427,13 +426,6 @@ const PANEL = [
     { key: "START / STOP", en: "Press to start. Hold to stop a bake early. When the oven is idle, holding it for 5 seconds turns the oven off.", he: "לחיצה מתחילה. החזקה עוצרת אפייה לפני הזמן. כשהתנור לא עובד, החזקה של 5 שניות מכבה אותו." },
     { icon: "prover", en: "Proofer: switches the panel to a proofing cabinet, if one is connected. Not for baking.", he: "מתפחה: מעביר את הלוח למתפחה, אם מחוברת. לא לאפייה." }
   ] }
-];
-const USE_PROGRAM = [
-  { en: "Press the program's P button. Its light starts flashing.", he: "ללחוץ על כפתור ה-P של התוכנית. הנורה שלו מתחילה להבהב." },
-  { en: "Press START / STOP.", he: "ללחוץ על START / STOP." },
-  { en: "The oven preheats. Don't put food in yet.", he: "התנור מתחמם. עדיין לא מכניסים אוכל." },
-  { en: "When it beeps and the oven light flashes, put the trays in and close the door. Baking starts by itself.", he: "כשיש צפצוף ואור התנור מהבהב, להכניס את המגשים ולסגור את הדלת. האפייה מתחילה לבד." },
-  { en: "When it beeps and the light flashes again, the pastries are ready.", he: "כשיש שוב צפצוף והאור מהבהב, המאפים מוכנים." }
 ];
 
 const BAKING = [
@@ -666,7 +658,6 @@ function renderBaking() {
         <div class="panel">${PANEL.map(g => `<div class="pgroup"><h4>${t(g.group)}</h4><dl>${g.keys.map(k =>
           `<dt class="${k.warn ? "warn" : ""}">${k.icon ? `<span class="keycap ico">${I[k.icon]}</span>` : `<span class="keycap" dir="ltr">${k.key}</span>`}</dt><dd class="${k.warn ? "warn" : ""}">${t(k)}</dd>`).join("")}</dl></div>`).join("")}</div>
       </section>
-      <section class="card"><h3>${t(UI.useProgram)}</h3><ol class="checks">${USE_PROGRAM.map(s => `<li>${t(s)}</li>`).join("")}</ol></section>
       ${BAKING.map(x => `<section class="card"><div class="pastry-head"><h3>${t(x.name)}</h3><span class="pill"><bdi dir="ltr">${x.time}</bdi> ${t(UI.min)}</span></div>
         <p class="flush"><b>${t(UI.finish)}:</b> ${t(x.finish)}</p>
         <p class="flush"><b>${t(UI.ingredients)}:</b> ${txt(TODO("To be added", "יתווספו בהמשך"))}</p></section>`).join("")}
