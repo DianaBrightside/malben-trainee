@@ -136,6 +136,7 @@ code { font-family: ui-monospace, "SF Mono", Menlo, monospace; background: var(-
 .pastry-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px; }
 .pastry-head h3 { margin: 0; }
 .pill { background: var(--accent); color: var(--accent-ink); border-radius: 999px; padding: 1px 12px; font-size: 14px; font-weight: 700; white-space: nowrap; }
+.panel-note { margin: -4px 0 14px; }
 .panel { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 28px; }
 .pgroup h4 { margin: 0 0 8px; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
 .pgroup dl { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 10px 12px; margin: 0; align-items: start; }
@@ -220,7 +221,8 @@ const UI = {
   preheat: { en: "Preheat", he: "חימום מראש" },
   fan: { en: "Fan", he: "מאוורר" },
   howMany: { en: "How many to bake", he: "כמה לאפות" },
-  panel: { en: "Oven buttons", he: "כפתורי התנור" },
+  panel: { en: "Oven buttons · Katzenelson 50", he: "כפתורי התנור · כצנלסון 50" },
+  panelNote: { en: "This guide is for the oven at Katzenelson 50.", he: "ההסבר מתאים לתנור בכצנלסון 50." },
   bakeTime: { en: "Bake", he: "אפייה" },
   finish: { en: "Finish", he: "גימור" },
   ingredients: { en: "Ingredients", he: "מרכיבים" },
@@ -392,7 +394,6 @@ const OVEN = {
   temp: "165°C",
   preheat: { en: "5 min", he: "5 דק'" },
   fan: { en: "1", he: "1" },
-  photos: TODO("Oven photos coming", "תמונות של התנור יתווספו בהמשך"),
   howMany: { en: "Limor sends how many of each pastry to bake on WhatsApp every morning.", he: "לימור שולחת בוואטסאפ כל בוקר כמה לאפות מכל מאפה." }
 };
 
@@ -429,7 +430,7 @@ const PANEL = [
 ];
 
 const BAKING = [
-  { name: { en: "Rugelach", he: "רוגלך" }, time: "23",
+  { name: { en: "Rogalach", he: "רוגעלך" }, time: "23",
     finish: { en: "Pour sugar water over the top", he: "לשפוך מי סוכר מלמעלה" } },
   { name: { en: "Cinnabon", he: "סינבון" }, time: "15–17",
     finish: { en: "Pour sugar water over the top", he: "לשפוך מי סוכר מלמעלה" } },
@@ -650,11 +651,11 @@ function renderBaking() {
     <div class="sheet">
       <section class="card"><h3>${t(UI.oven)}</h3>
         <dl class="specs three">${spec("temp", `<bdi dir="ltr">${OVEN.temp}</bdi>`)}${spec("preheat", t(OVEN.preheat))}${spec("fan", t(OVEN.fan))}</dl>
-        <p class="small">${txt(OVEN.photos)}</p>
       </section>
       <section class="card"><h3>${t(UI.howMany)}</h3><p class="flush">${t(OVEN.howMany)}</p></section>
       <section class="card wide">${bakeTable()}</section>
       <section class="card wide"><h3>${t(UI.panel)}</h3>
+        <p class="small panel-note">${t(UI.panelNote)}</p>
         <div class="panel">${PANEL.map(g => `<div class="pgroup"><h4>${t(g.group)}</h4><dl>${g.keys.map(k =>
           `<dt class="${k.warn ? "warn" : ""}">${k.icon ? `<span class="keycap ico">${I[k.icon]}</span>` : `<span class="keycap" dir="ltr">${k.key}</span>`}</dt><dd class="${k.warn ? "warn" : ""}">${t(k)}</dd>`).join("")}</dl></div>`).join("")}</div>
       </section>
