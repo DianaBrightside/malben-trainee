@@ -41,6 +41,8 @@ python3 build_app.py > /dev/null && { [ -z "$(git status --porcelain docs)" ] &&
 
 ## Sharp edges
 
+- **Pasted Hebrew arrives reversed.** Text copied from the user's source document comes in with each word's letters reversed and in odd order (e.g. `הנירטיו` for `ויטרינה`, `ח"ש` for `ש"ח`). Reverse each word and reorder it before using it, keep the meaning as written, and ask the user to check any word you're unsure of.
+
 ## How to work with me
 
 - Commit and push yourself, right after each change that makes sense on its own. Don't wait for me and don't pile changes up. Never force-push.
