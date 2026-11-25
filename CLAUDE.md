@@ -17,7 +17,7 @@ All content lives in the data section at the top of the page's `<script>`, above
 - `DRINKS`: drink tutorials. `SHOT` and `STEAM` hold steps shared by several drinks.
 - `HOW_MANY`, `BAKING`: the Baking page's top cards and the bake table (also shown in the Katzenelson 50 opening routine).
 - `OVENS`: one entry per branch oven for the Baking page's "Oven instructions" toggle: settings, a button guide (`PANEL` for Katzenelson 50's Unox, `PANEL_135` for Katzenelson 135's Tecnoeka) and optional how-to steps (`STEPS_135`). Button icons are in `I`.
-- `SEATING`, `CASHIER`, `OPENING_K50`, `OPENING_WEIZMAN`: opening-routine phases. `SEATING` is shared by Katzenelson 50 and 135.
+- `COFFEE`, `SEATING`, `CASHIER`, `OPENING_K50`, `OPENING_WEIZMAN`: opening-routine phases. `SEATING` is shared by Katzenelson 50 and 135; `COFFEE` by Katzenelson 50 and Weizman (Weizman adds its own steps on top).
 - `BRANCHES`: one entry per branch. Starts from `BRANCH_TEMPLATE()` and overrides what is known.
 
 Keep the locker code and other access codes out of the page.
@@ -30,10 +30,10 @@ Run from the project folder, after committing. All must print `PASS`.
 # 1. The page's script has no syntax errors
 sed -n '/<script>/,/<\/script>/p' malben-trainee.html | sed '1d;$d' | node --check - && echo PASS
 
-# 2. The page renders in Chrome (the script runs and draws the drink steps)
+# 2. The page renders in Chrome (the script runs and fills the app area with the Drinks view)
 "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new --disable-gpu \
   --user-data-dir="$(mktemp -d)" --virtual-time-budget=3000 --dump-dom "file://$PWD/malben-trainee.html" 2>/dev/null \
-  | grep -q 'class="steps"' && echo PASS || echo FAIL
+  | grep -q '<main id="app"><div class="drinks">' && echo PASS || echo FAIL
 
 # 3. docs/ is built from the current source (fails if the build changes anything not yet committed)
 python3 build_app.py > /dev/null && { [ -z "$(git status --porcelain docs)" ] && echo PASS || echo "FAIL: docs/ out of date"; }
@@ -42,6 +42,7 @@ python3 build_app.py > /dev/null && { [ -z "$(git status --porcelain docs)" ] &&
 ## Sharp edges
 
 - **Pasted Hebrew arrives reversed.** Text copied from the user's source document comes in with each word's letters reversed and in odd order (e.g. `הנירטיו` for `ויטרינה`, `ח"ש` for `ש"ח`). Reverse each word and reorder it before using it, keep the meaning as written, and ask the user to check any word you're unsure of.
+- **Checking rendered output: grep only for text the script produces.** The page source contains its own templates and CSS, so strings like `class="steps"` or `aria-current="true"` match even when the script fails to run. Look inside `<main id="app">` of the dumped DOM, for a string that only exists after rendering.
 
 ## How to work with me
 

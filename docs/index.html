@@ -528,6 +528,26 @@ const CASHIER = { title: { en: "Cashier", he: "קופה" },
       ] }
   ] };
 
+// Same at Katzenelson 50 and Weizman.
+const COFFEE = { title: { en: "Coffee station", he: "עמדת קפה" },
+    items: [
+      { en: "<b>Group heads.</b> Pull two double shots from each group head.", he: "<b>ראשים.</b> להוריד שתי מנות כפולות מכל ראש." },
+      { en: "<b>Steam wands.</b> Open each steam wand for a few seconds to release the pressure, then wipe it with a clean cloth.", he: "<b>סטימרים.</b> לפתוח כל סטימר לכמה שניות כדי לשחרר לחץ, ואז לנגב עם סמרטוט נקי." },
+      { en: "<b>Take out of the fridges:</b>", he: "<b>להוציא מהמקררים:</b>",
+        groups: [
+          { label: { en: "Milks", he: "חלבים" }, chips: [{ en: "Regular", he: "רגיל" }, { en: "Low-fat", he: "דל" }, { en: "Almond", he: "שקדים" }, { en: "Soy", he: "סויה" }, { en: "Oat", he: "שיבולת" }] },
+          { label: { en: "Drinks", he: "משקאות" }, chips: [{ en: "Iced tea", he: "תה קר" }] },
+          { label: { en: "Syrups", he: "סירופים" }, chips: [{ en: "Vanilla", he: "וניל" }, { en: "Strawberry", he: "תות" }, { en: "Caramel", he: "קרמל" }] },
+          { label: { en: "Garnishes", he: "גרנישים" }, chips: [{ en: "If there are any", he: "אם יש" }] }
+        ] },
+      { en: "<b>Garnish station.</b> Fill it up so everything is ready to use:", he: "<b>עמדת גרנישים.</b> למלא כך שהכול מוכן לשימוש:",
+        sub: [
+          { en: "Cinnamon sticks: refill", he: "מקלות קינמון: למלא" },
+          { en: "Lemon: slice", he: "לימון: לחתוך" },
+          { en: "Mint: pick the leaves apart and cut into neat sprigs", he: "נענע: להפריד ולחתוך לתפרחות יפות" }
+        ] }
+    ] };
+
 const OPENING_WEIZMAN = [
   { title: { en: "Display case (vitrina)", he: "ויטרינה" },
     fifo: true,
@@ -548,7 +568,11 @@ const OPENING_WEIZMAN = [
   { title: { en: "Products from the kitchen window", he: "הורדת מוצרים מהחלון" },
     items: [
       { en: "During opening, the kitchen puts products on the window. Take each product down right away and put it in its place.", he: "במהלך הפתיחה המטבח שם מוצרים על החלון. מורידים מיד כל מוצר מהחלון ומסדרים אותו במקומו." }
-    ] }
+    ] },
+  { ...COFFEE, items: [...COFFEE.items,
+    { en: "<b>Orange juice machine.</b> Fill the machine with oranges and turn it on. Make sure there's a jug for the juice.", he: "<b>מכונת תפוזים.</b> למלא תפוזים במכונה ולהדליק אותה. לוודא שיש כד למיץ." },
+    { en: "<b>Jerrycans.</b> Check how many jerrycans need to go to the branches and get them ready.", he: "<b>ג׳ריקנים.</b> לבדוק כמה ג׳ריקנים צריך לשלוח לסניפים ולהכין אותם." }
+  ] }
 ];
 
 const OPENING_K50 = [
@@ -572,24 +596,7 @@ const OPENING_K50 = [
       { en: "Check Limor's WhatsApp message for how many to bake.", he: "לבדוק בהודעת הוואטסאפ של לימור כמה לאפות." },
       { en: "Bake, take each tray out on time, finish and put on its tray:", he: "לאפות, להוציא כל מגש בזמן, לעשות גימור ולהניח על המגש שלו:" }
     ] },
-  { title: { en: "Coffee station", he: "עמדת קפה" },
-    items: [
-      { en: "<b>Group heads.</b> Pull two double shots from each group head.", he: "<b>ראשים.</b> להוריד שתי מנות כפולות מכל ראש." },
-      { en: "<b>Steam wands.</b> Open each steam wand for a few seconds to release the pressure, then wipe it with a clean cloth.", he: "<b>סטימרים.</b> לפתוח כל סטימר לכמה שניות כדי לשחרר לחץ, ואז לנגב עם סמרטוט נקי." },
-      { en: "<b>Take out of the fridges:</b>", he: "<b>להוציא מהמקררים:</b>",
-        groups: [
-          { label: { en: "Milks", he: "חלבים" }, chips: [{ en: "Regular", he: "רגיל" }, { en: "Low-fat", he: "דל" }, { en: "Almond", he: "שקדים" }, { en: "Soy", he: "סויה" }, { en: "Oat", he: "שיבולת" }] },
-          { label: { en: "Drinks", he: "משקאות" }, chips: [{ en: "Iced tea", he: "תה קר" }] },
-          { label: { en: "Syrups", he: "סירופים" }, chips: [{ en: "Vanilla", he: "וניל" }, { en: "Strawberry", he: "תות" }, { en: "Caramel", he: "קרמל" }] },
-          { label: { en: "Garnishes", he: "גרנישים" }, chips: [{ en: "If there are any", he: "אם יש" }] }
-        ] },
-      { en: "<b>Garnish station.</b> Fill it up so everything is ready to use:", he: "<b>עמדת גרנישים.</b> למלא כך שהכול מוכן לשימוש:",
-        sub: [
-          { en: "Cinnamon sticks: refill", he: "מקלות קינמון: למלא" },
-          { en: "Lemon: slice", he: "לימון: לחתוך" },
-          { en: "Mint: pick the leaves apart and cut into neat sprigs", he: "נענע: להפריד ולחתוך לתפרחות יפות" }
-        ] }
-    ] },
+  COFFEE,
   SEATING,
   CASHIER
 ];
