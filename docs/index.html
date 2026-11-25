@@ -157,7 +157,13 @@ code { font-family: ui-monospace, "SF Mono", Menlo, monospace; background: var(-
 .pastry-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px; }
 .pastry-head h3 { margin: 0; }
 .pill { background: var(--accent); color: var(--accent-ink); border-radius: 999px; padding: 1px 12px; font-size: 14px; font-weight: 700; white-space: nowrap; }
-.panel-note { margin: -4px 0 14px; }
+.panel-note { margin: 0 0 4px; }
+.oven-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; margin-bottom: 10px; }
+.oven-head h3 { margin: 0; }
+.toggle { display: inline-flex; background: var(--bg); border-radius: 999px; padding: 3px; gap: 2px; }
+.toggle button { border: 0; background: transparent; border-radius: 999px; padding: 6px 14px; font-weight: 600; font-size: 15px; color: var(--muted); }
+.toggle button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+.sub-h { margin: 18px 0 10px; font-size: 15px; color: var(--brand); }
 .panel { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 28px; }
 .pgroup h4 { margin: 0 0 8px; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
 .pgroup dl { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 10px 12px; margin: 0; align-items: start; }
@@ -236,15 +242,14 @@ const UI = {
   closing: { en: "Closing the shift", he: "סגירת משמרת" },
   special: { en: "What's different here", he: "מה מיוחד בסניף" },
   baking: { en: "Baking", he: "אפייה" },
-  bakeNote: { en: "All pastries bake at the same temperature, so they can go in together. Take each tray out at its own time.",
-              he: "כל המאפים נאפים באותה טמפרטורה, אפשר להכניס יחד. מוציאים כל מגש בזמן שלו." },
-  oven: { en: "Oven", he: "תנור" },
   temp: { en: "Temperature", he: "טמפרטורה" },
   preheat: { en: "Preheat", he: "חימום מראש" },
   fan: { en: "Fan", he: "מאוורר" },
   howMany: { en: "How many to bake", he: "כמה לאפות" },
-  panel: { en: "Oven buttons · Katzenelson 50", he: "כפתורי התנור · כצנלסון 50" },
-  panelNote: { en: "This guide is for the oven at Katzenelson 50.", he: "ההסבר מתאים לתנור בכצנלסון 50." },
+  ovenGuide: { en: "Oven instructions", he: "הוראות תנור" },
+  settings: { en: "Settings", he: "הגדרות" },
+  controls: { en: "Buttons", he: "כפתורים" },
+  howToBake: { en: "How to bake", he: "איך אופים" },
   bakeTime: { en: "Bake", he: "אפייה" },
   finish: { en: "Finish", he: "גימור" },
   ingredients: { en: "Ingredients", he: "מרכיבים" },
@@ -412,12 +417,7 @@ const DRINKS = [
 
 const TODO = (en, he) => ({ en, he, todo: true });
 
-const OVEN = {
-  temp: "165°C",
-  preheat: { en: "5 min", he: "5 דק'" },
-  fan: { en: "1", he: "1" },
-  howMany: { en: "Limor sends how many of each pastry to bake on WhatsApp every morning.", he: "לימור שולחת בוואטסאפ כל בוקר כמה לאפות מכל מאפה." }
-};
+const HOW_MANY = { en: "Limor sends how many of each pastry to bake on WhatsApp every morning.", he: "לימור שולחת בוואטסאפ כל בוקר כמה לאפות מכל מאפה." };
 
 // Unox BAKERLUX SHOP.Pro LED panel, from the Unox operation manual.
 const I = {
@@ -426,7 +426,11 @@ const I = {
   steam: '<svg viewBox="0 0 24 24"><path d="M6 20c-2-3 2-5 0-8M11 20c-2-3 2-5 0-8M16 20c-2-3 2-5 0-8M14 7l6-4"/></svg>',
   fan: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 12c0-4 2-6 4-5M12 12c4 0 6 2 5 4M12 12c0 4-2 6-4 5M12 12c-4 0-6-2-5-4"/></svg>',
   oven: '<svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18"/><path d="M5 9h14M12 9v12"/></svg>',
-  prover: '<svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18"/><path d="M5 13h14M12 13v8"/></svg>'
+  prover: '<svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18"/><path d="M5 13h14M12 13v8"/></svg>',
+  knob: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 12V4"/></svg>',
+  key: '<svg viewBox="0 0 24 24"><rect x="8" y="5" width="8" height="14" rx="2"/></svg>',
+  green: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" fill="#3cc463" stroke="none"/></svg>',
+  orange: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" fill="#f08a24" stroke="none"/></svg>'
 };
 const PANEL = [
   { group: { en: "Steps", he: "שלבים" }, keys: [
@@ -449,6 +453,40 @@ const PANEL = [
     { key: "START / STOP", en: "Press to start. Hold to stop a bake early. When the oven is idle, holding it for 5 seconds turns the oven off.", he: "לחיצה מתחילה. החזקה עוצרת אפייה לפני הזמן. כשהתנור לא עובד, החזקה של 5 שניות מכבה אותו." },
     { icon: "prover", en: "Proofer: switches the panel to a proofing cabinet, if one is connected. Not for baking.", he: "מתפחה: מעביר את הלוח למתפחה, אם מחוברת. לא לאפייה." }
   ] }
+];
+
+// Tecnoeka OnePoint (EKF 423) at Katzenelson 135, from the Tecnoeka use manual.
+const PANEL_135 = [
+  { group: { en: "Left knob · time", he: "כפתור שמאלי · זמן" }, keys: [
+    { icon: "knob", en: "Turning it switches the oven on. Set the baking time, up to 120 minutes. When the time is up, the oven switches itself off.", he: "סיבוב שלו מדליק את התנור. קובעים זמן אפייה, עד 120 דקות. כשהזמן נגמר התנור נכבה לבד." },
+    { key: "∞", en: "Continuous: the oven stays on until you turn the knob back to 0. Use it for preheating.", he: "רציף: התנור נשאר דולק עד שמחזירים את הכפתור ל-0. משתמשים בזה לחימום מראש." },
+    { icon: "green", en: "Green light: the oven has power and the timer is running.", he: "נורה ירוקה: התנור מחובר והטיימר פועל." }
+  ] },
+  { group: { en: "Right knob · temperature", he: "כפתור ימני · טמפרטורה" }, keys: [
+    { icon: "knob", en: "Set the temperature.", he: "קובעים את הטמפרטורה." },
+    { icon: "orange", en: "Orange light: on while the oven is heating. It goes off when the oven reaches the temperature, and keeps switching on and off during baking. That's normal.", he: "נורה כתומה: דולקת כשהתנור מתחמם. נכבית כשהתנור מגיע לטמפרטורה, וממשיכה להידלק ולהיכבות בזמן האפייה. זה תקין." }
+  ] },
+  { group: { en: "Small key in the middle", he: "מקש קטן באמצע" }, keys: [
+    { icon: "key", en: "Steam: while the oven is on and hot, press it for a few seconds to add steam.", he: "אדים: כשהתנור דולק וחם, לוחצים כמה שניות כדי להוסיף אדים." }
+  ] }
+];
+const STEPS_135 = [
+  { en: "Turn the left knob to ∞ to switch the oven on.", he: "לסובב את הכפתור השמאלי ל-∞ כדי להדליק את התנור." },
+  { en: "Turn the right knob to the baking temperature.", he: "לסובב את הכפתור הימני לטמפרטורת האפייה." },
+  { en: "Wait until the orange light goes off. The oven is hot.", he: "לחכות שהנורה הכתומה תיכבה. התנור חם." },
+  { en: "Put the pastries in and close the door.", he: "להכניס את המאפים ולסגור את הדלת." },
+  { en: "Take each tray out at its time.", he: "להוציא כל מגש בזמן שלו." },
+  { en: "When you finish, turn both knobs back to 0.", he: "בסיום, להחזיר את שני הכפתורים ל-0." }
+];
+
+const OVENS = [
+  { name: { en: "Katzenelson 50", he: "כצנלסון 50" },
+    note: { en: "All pastries bake at the same temperature, so they can go in together. Take each tray out at its own time.", he: "כל המאפים נאפים באותה טמפרטורה, אפשר להכניס יחד. מוציאים כל מגש בזמן שלו." },
+    temp: { en: "165°C", he: "165°C" }, preheat: { en: "5 min", he: "5 דק'" }, fan: { en: "1", he: "1" },
+    panel: PANEL },
+  { name: { en: "Katzenelson 135", he: "כצנלסון 135" },
+    temp: TODO("To be added", "יתווסף"), preheat: TODO("To be added", "יתווסף"),
+    panel: PANEL_135, steps: STEPS_135 }
 ];
 
 const BAKING = [
@@ -599,6 +637,7 @@ const S = {
   view: store.get("view", "drinks"),
   drink: store.get("drink", "espresso"),
   branch: store.get("branch", 0),
+  oven: store.get("oven", 0),
   stepMode: false,
   step: 0
 };
@@ -606,7 +645,7 @@ const t = (o) => o[S.lang];
 const txt = (o) => o.todo ? `<span class="todo">${t(o)}</span>` : t(o);
 const app = document.getElementById("app");
 
-function save() { ["lang", "view", "drink", "branch"].forEach(k => store.set(k, S[k])); }
+function save() { ["lang", "view", "drink", "branch", "oven"].forEach(k => store.set(k, S[k])); }
 
 function renderBar() {
   document.documentElement.lang = S.lang;
@@ -667,19 +706,24 @@ const bakeTable = () => `<div class="tbl"><table class="bake">
 </table></div>`;
 
 function renderBaking() {
-  const spec = (k, v) => `<div class="spec"><dt>${t(UI[k])}</dt><dd>${v}</dd></div>`;
+  const o = OVENS[S.oven] || OVENS[0];
+  const specs = ["temp", "preheat", "fan"].filter(k => o[k]).map(k =>
+    `<div class="spec"><dt>${t(UI[k])}</dt><dd><bdi>${txt(o[k])}</bdi></dd></div>`).join("");
+  const pick = OVENS.map((x, i) =>
+    `<button data-oven="${i}" aria-pressed="${x === o}">${t(x.name)}</button>`).join("");
   app.innerHTML = `
-    <p class="note">${t(UI.bakeNote)}</p>
     <div class="sheet">
-      <section class="card"><h3>${t(UI.oven)}</h3>
-        <dl class="specs three">${spec("temp", `<bdi dir="ltr">${OVEN.temp}</bdi>`)}${spec("preheat", t(OVEN.preheat))}${spec("fan", t(OVEN.fan))}</dl>
-      </section>
-      <section class="card"><h3>${t(UI.howMany)}</h3><p class="flush">${t(OVEN.howMany)}</p></section>
+      <section class="card wide"><h3>${t(UI.howMany)}</h3><p class="flush">${t(HOW_MANY)}</p></section>
       <section class="card wide">${bakeTable()}</section>
-      <section class="card wide"><h3>${t(UI.panel)}</h3>
-        <p class="small panel-note">${t(UI.panelNote)}</p>
-        <div class="panel">${PANEL.map(g => `<div class="pgroup"><h4>${t(g.group)}</h4><dl>${g.keys.map(k =>
+      <section class="card wide">
+        <div class="oven-head"><h3>${t(UI.ovenGuide)}</h3><div class="toggle" role="group" aria-label="${t(UI.ovenGuide)}">${pick}</div></div>
+        ${o.note ? `<p class="small panel-note">${t(o.note)}</p>` : ""}
+        <h4 class="sub-h">${t(UI.settings)}</h4>
+        <dl class="specs three">${specs}</dl>
+        <h4 class="sub-h">${t(UI.controls)}</h4>
+        <div class="panel">${o.panel.map(g => `<div class="pgroup"><h4>${t(g.group)}</h4><dl>${g.keys.map(k =>
           `<dt class="${k.warn ? "warn" : ""}">${k.icon ? `<span class="keycap ico">${I[k.icon]}</span>` : `<span class="keycap" dir="ltr">${k.key}</span>`}</dt><dd class="${k.warn ? "warn" : ""}">${t(k)}</dd>`).join("")}</dl></div>`).join("")}</div>
+        ${o.steps ? `<h4 class="sub-h">${t(UI.howToBake)}</h4><ol class="checks">${o.steps.map(s => `<li>${t(s)}</li>`).join("")}</ol>` : ""}
       </section>
       ${BAKING.map(x => `<section class="card"><div class="pastry-head"><h3>${t(x.name)}</h3><span class="pill"><bdi dir="ltr">${x.time}</bdi> ${t(UI.min)}</span></div>
         <p class="flush"><b>${t(UI.finish)}:</b> ${t(x.finish)}</p>
@@ -735,6 +779,7 @@ document.addEventListener("click", (e) => {
   else if (el.dataset.view) S.view = el.dataset.view;
   else if (el.dataset.drink) { S.drink = el.dataset.drink; S.step = 0; }
   else if (el.dataset.branch) S.branch = +el.dataset.branch;
+  else if (el.dataset.oven) S.oven = +el.dataset.oven;
   else if ("mode" in el.dataset) { S.stepMode = !S.stepMode; S.step = 0; }
   else if (el.dataset.step) {
     if (el.dataset.step === "done") { S.stepMode = false; S.step = 0; }

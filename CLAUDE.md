@@ -15,7 +15,8 @@ All content lives in the data section at the top of the page's `<script>`, above
 
 - `UI`: interface labels.
 - `DRINKS`: drink tutorials. `SHOT` and `STEAM` hold steps shared by several drinks.
-- `OVEN`, `BAKING`: the Baking page and the bake table in the opening routine.
+- `HOW_MANY`, `BAKING`: the Baking page's top cards and the bake table (also shown in the Katzenelson 50 opening routine).
+- `OVENS`: one entry per branch oven for the Baking page's "Oven instructions" toggle: settings, a button guide (`PANEL` for Katzenelson 50's Unox, `PANEL_135` for Katzenelson 135's Tecnoeka) and optional how-to steps (`STEPS_135`). Button icons are in `I`.
 - `SEATING`, `CASHIER`, `OPENING_K50`: opening-routine phases. `SEATING` is shared by Katzenelson 50 and 135.
 - `BRANCHES`: one entry per branch. Starts from `BRANCH_TEMPLATE()` and overrides what is known.
 
