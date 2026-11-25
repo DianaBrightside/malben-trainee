@@ -159,13 +159,12 @@ code { font-family: ui-monospace, "SF Mono", Menlo, monospace; background: var(-
 .pill { background: var(--accent); color: var(--accent-ink); border-radius: 999px; padding: 1px 12px; font-size: 14px; font-weight: 700; white-space: nowrap; }
 .panel { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 28px; }
 .pgroup h4 { margin: 0 0 8px; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
-.pgroup dl, .progs { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 10px 12px; margin: 0; align-items: start; }
-.pgroup dd, .progs dd { margin: 0; min-width: 0; }
+.pgroup dl { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 10px 12px; margin: 0; align-items: start; }
+.pgroup dd { margin: 0; min-width: 0; }
 .keycap { display: inline-flex; align-items: center; justify-content: center; min-width: 40px; height: 30px; padding: 0 9px; border-radius: 6px; background: #1b1b1b; color: #f2f2f2; font-weight: 700; font-size: 13px; letter-spacing: .04em; white-space: nowrap; }
 .keycap.ico svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
 dt.warn .keycap { background: var(--todo-ink); color: var(--todo-bg); }
 dd.warn { font-weight: 700; color: var(--todo-ink); background: var(--todo-bg); padding: 4px 8px; border-radius: 4px; }
-.progs { grid-template-columns: max-content minmax(0, 1fr) max-content minmax(0, 1fr); gap: 8px 10px; align-items: center; }
 .note { font-size: 15px; color: var(--muted); margin: 0 0 16px; max-width: 70ch; }
 
 @media (max-width: 760px) {
@@ -182,7 +181,6 @@ dd.warn { font-weight: 700; color: var(--todo-ink); background: var(--todo-bg); 
   .spec:nth-child(n+3) { border-top: 1px solid var(--line); }
   .sheet { grid-template-columns: minmax(0, 1fr); }
   .panel { grid-template-columns: minmax(0, 1fr); }
-  .progs { grid-template-columns: max-content minmax(0, 1fr); }
   .card { padding: 20px; }
   .card-head h2 { font-size: 26px; }
   .focus-text { font-size: 22px; }
@@ -245,7 +243,6 @@ const UI = {
   fan: { en: "Fan", he: "מאוורר" },
   howMany: { en: "How many to bake", he: "כמה לאפות" },
   panel: { en: "Oven buttons", he: "כפתורי התנור" },
-  programs: { en: "Saved programs", he: "תוכניות שמורות" },
   useProgram: { en: "Baking with a saved program", he: "אפייה עם תוכנית שמורה" },
   bakeTime: { en: "Bake", he: "אפייה" },
   finish: { en: "Finish", he: "גימור" },
@@ -453,7 +450,6 @@ const PANEL = [
     { icon: "prover", en: "Proofer: switches the panel to a proofing cabinet, if one is connected. Not for baking.", he: "מתפחה: מעביר את הלוח למתפחה, אם מחוברת. לא לאפייה." }
   ] }
 ];
-const PROGRAMS = Array.from({ length: 12 }, (_, i) => ({ key: "P" + (i + 1), what: TODO("What is saved here?", "מה שמור כאן?") }));
 const USE_PROGRAM = [
   { en: "Press the program's P button. Its light starts flashing.", he: "ללחוץ על כפתור ה-P של התוכנית. הנורה שלו מתחילה להבהב." },
   { en: "Press START / STOP.", he: "ללחוץ על START / STOP." },
@@ -693,9 +689,6 @@ function renderBaking() {
           `<dt class="${k.warn ? "warn" : ""}">${k.icon ? `<span class="keycap ico">${I[k.icon]}</span>` : `<span class="keycap" dir="ltr">${k.key}</span>`}</dt><dd class="${k.warn ? "warn" : ""}">${t(k)}</dd>`).join("")}</dl></div>`).join("")}</div>
       </section>
       <section class="card"><h3>${t(UI.useProgram)}</h3><ol class="checks">${USE_PROGRAM.map(s => `<li>${t(s)}</li>`).join("")}</ol></section>
-      <section class="card"><h3>${t(UI.programs)}</h3>
-        <dl class="progs">${PROGRAMS.map(p => `<dt><span class="keycap" dir="ltr">${p.key}</span></dt><dd>${txt(p.what)}</dd>`).join("")}</dl>
-      </section>
       ${BAKING.map(x => `<section class="card"><div class="pastry-head"><h3>${t(x.name)}</h3><span class="pill"><bdi dir="ltr">${x.time}</bdi> ${t(UI.min)}</span></div>
         <p class="flush"><b>${t(UI.finish)}:</b> ${t(x.finish)}</p>
         <p class="flush"><b>${t(UI.ingredients)}:</b> ${txt(TODO("To be added", "יתווספו בהמשך"))}</p></section>`).join("")}
