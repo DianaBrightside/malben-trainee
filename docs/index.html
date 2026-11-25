@@ -1,0 +1,708 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#E3DABB" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0d2224" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Malben">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="robots" content="noindex, nofollow">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>
+:root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+body { margin: 0; -webkit-text-size-adjust: 100%; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+</style>
+<title>Malben Trainee</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&display=swap">
+<style>
+/* Layout: minimal. Beige ground, Malben green for the logo and anything you can tap; no borders, just lighter panels */
+:root {
+  --bg: #E3DABB;
+  --paper: #EEE8D3;
+  --ink: #1c2b2b;
+  --muted: #5b625c;
+  --line: #cfc5a2;
+  --brand: #005357;
+  --accent: #005357;
+  --accent-ink: #F3EEDD;
+  --accent-soft: #d6ccA8;
+  --todo-bg: #f4e7a6;
+  --todo-ink: #5a4700;
+  --font: "Assistant", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+  --r: 6px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d2224; --paper: #132e30; --ink: #ece4c8; --muted: #a3aa9f; --line: #24423f;
+    --brand: #E3DABB; --accent: #E3DABB; --accent-ink: #0d2224; --accent-soft: #1d3c3d;
+    --todo-bg: #3d3414; --todo-ink: #f1dd8e; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d2224; --paper: #132e30; --ink: #ece4c8; --muted: #a3aa9f; --line: #24423f;
+  --brand: #E3DABB; --accent: #E3DABB; --accent-ink: #0d2224; --accent-soft: #1d3c3d;
+  --todo-bg: #3d3414; --todo-ink: #f1dd8e; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font); font-size: 17px; line-height: 1.55; }
+h1, h2, h3 { font-weight: 700; text-wrap: balance; margin: 0; line-height: 1.2; color: var(--brand); }
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); border-bottom: 1px solid var(--line); }
+.bar-in, main { max-width: 1040px; margin-inline: auto; padding-inline: 16px; }
+.bar-in { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 20px; padding-block: 14px; }
+.brand { display: flex; align-items: center; gap: 12px; margin-inline-end: auto; color: var(--brand); }
+.logo { height: 26px; width: auto; display: block; }
+.brand small { font-size: 13px; color: var(--muted); letter-spacing: .06em; padding-inline-start: 12px; border-inline-start: 1px solid var(--line); }
+.seg { display: inline-flex; gap: 18px; }
+.seg button { border: 0; background: transparent; padding: 4px 0; font-weight: 600; font-size: 16px; color: var(--muted); border-bottom: 2px solid transparent; }
+.seg button[aria-pressed="true"] { color: var(--accent); border-bottom-color: var(--accent); }
+.lang { border: 0; background: transparent; padding: 4px 0; font-weight: 600; font-size: 14px; color: var(--muted); text-decoration: underline; text-underline-offset: 3px; }
+
+main { padding-block: 28px 64px; }
+
+/* Drinks */
+.drinks { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 32px; align-items: start; }
+.list { display: flex; flex-direction: column; gap: 2px; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 80px); }
+.list h2 { font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); padding: 0 12px 8px; }
+.item { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; text-align: start; background: transparent; border: 0; border-radius: var(--r); padding: 8px 12px; }
+.item span:last-child { color: var(--muted); font-size: 14px; font-variant-numeric: tabular-nums; }
+.item:hover { background: var(--paper); }
+.item[aria-current="true"] { background: var(--accent); color: var(--accent-ink); font-weight: 700; }
+.item[aria-current="true"] span:last-child { color: var(--accent-ink); opacity: .8; }
+
+.card { background: var(--paper); border-radius: var(--r); padding: 28px; min-width: 0; }
+.card-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+.card-head h2 { font-size: 32px; }
+.btn { border: 1px solid var(--accent); background: var(--accent); color: var(--accent-ink); border-radius: 999px; padding: 7px 18px; font-weight: 600; }
+.btn.ghost { background: transparent; color: var(--accent); }
+.btn:disabled { opacity: .35; cursor: default; }
+.lede { color: var(--muted); margin: 6px 0 0; max-width: 62ch; }
+
+.specs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin: 22px 0 8px; border-block: 1px solid var(--line); }
+.spec { padding: 12px 14px; border-inline-start: 1px solid var(--line); min-width: 0; }
+.spec:first-child { border-inline-start: 0; padding-inline-start: 0; }
+.spec dt { font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.spec dd { margin: 2px 0 0; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+.steps { list-style: none; padding: 0; margin: 22px 0 0; display: flex; flex-direction: column; gap: 14px; counter-reset: s; }
+.steps li { display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 12px; counter-increment: s; }
+.steps li::before { content: counter(s); font-weight: 700; font-size: 15px; color: var(--accent); text-align: center; border: 1.5px solid var(--accent); border-radius: 50%; width: 28px; height: 28px; line-height: 25px; margin-top: 2px; font-variant-numeric: tabular-nums; }
+.steps li p { margin: 2px 0 0; }
+.steps h3 { font-weight: 600; font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 10px 0 -4px; }
+.steps li.group { display: block; counter-increment: none; }
+.steps li.group::before { content: none; }
+
+.tip { margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--line); }
+.tip strong { color: var(--accent); }
+
+/* Step mode */
+.focus { margin-top: 22px; display: flex; flex-direction: column; gap: 18px; min-height: 240px; }
+.focus-count { font-variant-numeric: tabular-nums; color: var(--accent); font-weight: 700; letter-spacing: .06em; }
+.focus-text { font-size: 26px; line-height: 1.35; margin: 0; flex: 1; max-width: 32ch; }
+.focus-nav { display: flex; gap: 10px; justify-content: space-between; }
+.dots { display: flex; gap: 6px; flex-wrap: wrap; }
+.dots i { width: 8px; height: 8px; border-radius: 50%; background: var(--line); }
+.dots i.on { background: var(--accent); }
+
+/* Branches */
+.branch-pick { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 22px; }
+.sheet { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.sheet .card { padding: 22px; }
+.sheet .wide { grid-column: 1 / -1; }
+.sheet h3 { font-size: 18px; margin-bottom: 10px; }
+.facts { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 6px 16px; margin: 0; }
+.facts dt { color: var(--muted); font-weight: 600; }
+.facts dd { margin: 0; }
+.hours { border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.hours th { font-weight: 400; text-align: start; padding: 0 16px 2px 0; padding-inline: 0 16px; }
+.hours td { padding: 0 0 2px; text-align: end; }
+.checks { margin: 0; padding-inline-start: 1.3em; display: flex; flex-direction: column; gap: 6px; }
+.todo { background: var(--todo-bg); color: var(--todo-ink); padding: 0 6px; border-radius: 4px; font-style: italic; }
+.phases { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; gap: 22px; counter-reset: ph; }
+.phases > li { counter-increment: ph; position: relative; padding-inline-start: 42px; display: flex; flex-direction: column; align-items: stretch; gap: 8px; min-width: 0; }
+.phases > li::before { content: counter(ph); position: absolute; inset-inline-start: 0; top: 0; font-weight: 700; font-size: 15px; color: var(--accent-ink); background: var(--accent); text-align: center; border-radius: 50%; width: 28px; height: 28px; line-height: 28px; font-variant-numeric: tabular-nums; }
+.phases > li > * { min-width: 0; }
+.phases h4 { margin: 2px 0 0; font-size: 17px; color: var(--brand); display: flex; align-items: center; gap: 8px; }
+.phases + * { margin-top: 0; }
+.checks li.plain { list-style: none; }
+.pick { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 6px 12px; align-items: center; margin: 8px 0 2px; }
+.pick dt { font-size: 14px; color: var(--muted); font-weight: 600; }
+.pick dd { margin: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.sub { margin: 6px 0 0; padding-inline-start: 1.1em; display: flex; flex-direction: column; gap: 4px; list-style: circle; }
+.tag { font-size: 11px; letter-spacing: .1em; border: 1px solid var(--accent); color: var(--accent); border-radius: 4px; padding: 0 6px; }
+.rule { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; font-size: 15px; color: var(--muted); margin-inline-start: -1.3em; }
+.chip { background: var(--accent); color: var(--accent-ink); border-radius: 999px; padding: 1px 12px; font-size: 14px; }
+.chip.ghost { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
+code { font-family: ui-monospace, "SF Mono", Menlo, monospace; background: var(--accent); color: var(--accent-ink); padding: 1px 8px; border-radius: 4px; letter-spacing: .12em; }
+.small { font-size: 14px; color: var(--muted); margin: 4px 0 0; }
+.flush { margin: 0 0 6px; }
+.btn.sm { padding: 5px 14px; font-size: 14px; align-self: flex-start; }
+.tbl { overflow-x: auto; }
+.bake { border-collapse: collapse; width: 100%; font-size: 15px; }
+.bake th { text-align: start; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; padding: 6px 12px 6px 0; padding-inline: 0 12px; border-bottom: 1px solid var(--line); }
+.bake td { padding: 8px 0; padding-inline-end: 12px; border-bottom: 1px solid var(--line); }
+.bake td.num { white-space: nowrap; font-variant-numeric: tabular-nums; font-weight: 700; }
+.specs.three { grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 0; }
+.pastry-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px; }
+.pastry-head h3 { margin: 0; }
+.pill { background: var(--accent); color: var(--accent-ink); border-radius: 999px; padding: 1px 12px; font-size: 14px; font-weight: 700; white-space: nowrap; }
+.note { font-size: 15px; color: var(--muted); margin: 0 0 16px; max-width: 70ch; }
+
+@media (max-width: 760px) {
+  .drinks { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .list { position: static; flex-direction: row; overflow-x: auto; gap: 6px; padding-bottom: 4px; }
+  .list h2 { display: none; }
+  .item { flex: 0 0 auto; background: var(--paper); border-radius: 999px; padding: 6px 14px; }
+  .item span:last-child { display: none; }
+  .specs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .specs.three .spec:nth-child(3) { border-inline-start: 1px solid var(--line); padding-inline-start: 14px; }
+  .specs.three .spec:nth-child(n+3) { border-top: 0; }
+  .specs.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .spec:nth-child(3) { border-inline-start: 0; padding-inline-start: 0; }
+  .spec:nth-child(n+3) { border-top: 1px solid var(--line); }
+  .sheet { grid-template-columns: minmax(0, 1fr); }
+  .card { padding: 20px; }
+  .card-head h2 { font-size: 26px; }
+  .focus-text { font-size: 22px; }
+  .logo { height: 22px; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .focus-text { animation: in .2s ease-out; }
+  @keyframes in { from { opacity: .4; transform: translateY(4px); } }
+}
+</style>
+</head>
+<body>
+<header class="bar">
+  <div class="bar-in">
+    <div class="brand"><svg class="logo" role="img" aria-label="Malben" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3372 784"><path fill="currentColor" fill-rule="evenodd" d="M1603.0,726.2 L1372.0,726.6 L1368.0,725.9 L1365.7,723.0 L1365.3,698.0 L1367.1,694.0 L1371.0,692.1 L1384.4,690.0 L1399.0,686.2 L1410.0,680.3 L1416.0,674.0 L1420.4,663.0 L1422.1,652.0 L1423.0,636.0 L1423.0,171.0 L1422.1,155.0 L1420.2,144.0 L1417.4,137.0 L1415.0,133.0 L1410.0,127.8 L1404.0,123.9 L1395.0,120.0 L1371.7,114.0 L1367.3,111.0 L1366.4,108.0 L1366.4,86.0 L1367.8,83.0 L1371.0,81.2 L1422.0,74.9 L1474.0,66.3 L1512.0,58.3 L1531.0,53.5 L1544.0,49.0 L1547.0,49.8 L1548.3,52.0 L1548.1,619.0 L1548.9,651.0 L1550.6,663.0 L1553.0,671.0 L1556.0,676.3 L1561.0,681.6 L1570.0,686.4 L1584.1,690.0 L1601.0,692.2 L1605.0,695.0 L1606.1,699.0 L1605.8,722.0 L1605.0,724.5 L1603.0,726.2Z M1877.0,738.1 L1849.0,738.3 L1833.0,737.3 L1801.0,734.0 L1779.2,730.0 L1747.0,722.2 L1720.0,714.0 L1697.0,706.0 L1692.0,703.2 L1690.6,701.0 L1691.6,671.0 L1691.6,169.0 L1690.8,157.0 L1689.2,145.0 L1686.0,135.4 L1682.0,129.2 L1677.2,125.0 L1666.0,119.7 L1646.0,115.9 L1636.0,115.2 L1632.4,113.0 L1631.6,110.0 L1631.5,86.0 L1632.9,83.0 L1636.0,81.2 L1691.0,74.0 L1735.0,66.5 L1795.0,54.2 L1812.0,48.8 L1815.0,49.3 L1816.5,51.0 L1817.0,54.0 L1816.7,311.0 L1817.4,317.0 L1819.0,318.1 L1822.0,317.7 L1860.1,300.0 L1881.0,292.2 L1896.4,288.0 L1906.0,286.5 L1929.0,285.6 L1954.0,287.8 L1973.0,291.9 L1987.0,296.0 L2006.5,304.0 L2027.0,315.7 L2038.9,324.0 L2058.3,341.0 L2074.0,358.9 L2086.0,376.2 L2096.9,396.0 L2105.1,416.0 L2112.3,441.0 L2117.0,472.0 L2117.6,497.0 L2114.3,530.0 L2108.9,554.0 L2100.8,579.0 L2088.1,606.0 L2073.3,630.0 L2054.2,654.0 L2034.2,674.0 L2014.0,690.1 L1989.0,706.1 L1963.0,718.5 L1942.0,726.3 L1911.0,734.1 L1877.0,738.1Z M872.0,726.0 L869.0,726.6 L587.0,726.6 L583.0,726.1 L580.5,724.0 L579.8,695.0 L581.0,691.7 L585.0,689.9 L615.0,685.4 L627.0,682.3 L636.3,678.0 L642.1,674.0 L648.2,667.0 L652.2,659.0 L655.6,646.0 L657.8,621.0 L658.5,563.0 L657.8,551.0 L657.5,224.0 L656.0,220.8 L654.0,221.5 L652.5,224.0 L555.5,458.0 L447.3,715.0 L443.0,724.1 L440.4,726.0 L437.0,726.6 L412.0,726.1 L409.0,723.4 L405.5,716.0 L299.3,445.0 L217.7,242.0 L215.6,235.0 L212.0,229.0 L209.6,228.0 L208.4,232.0 L197.9,532.0 L196.8,580.0 L196.8,622.0 L197.9,634.0 L201.0,649.0 L205.0,658.2 L211.1,666.0 L221.0,674.2 L229.0,678.3 L241.0,682.5 L261.0,686.8 L285.0,689.8 L288.0,691.4 L289.5,695.0 L288.7,724.0 L287.0,726.1 L284.0,726.7 L56.0,726.6 L51.0,725.5 L49.6,724.0 L49.0,721.0 L48.8,695.0 L49.8,692.0 L53.0,690.2 L75.0,687.1 L91.0,683.3 L103.0,678.5 L110.0,674.3 L119.2,666.0 L127.2,654.0 L131.6,643.0 L135.2,630.0 L139.1,603.0 L143.5,551.0 L167.4,213.0 L167.9,199.0 L167.0,185.0 L163.6,172.0 L159.0,163.6 L154.0,157.6 L147.0,151.9 L131.5,144.0 L119.0,140.2 L103.0,136.9 L82.0,133.8 L80.5,132.0 L79.9,127.0 L79.8,103.0 L80.6,100.0 L83.0,98.3 L86.0,97.8 L284.0,97.7 L287.0,98.2 L290.2,100.0 L311.9,148.0 L473.0,517.4 L474.0,518.9 L476.0,519.4 L478.0,518.5 L479.6,516.0 L493.0,483.7 L662.4,100.0 L665.0,98.4 L669.0,97.8 L862.0,97.7 L866.3,99.0 L868.1,103.0 L868.0,128.0 L867.6,131.0 L866.0,133.5 L863.0,134.7 L828.0,139.5 L813.0,143.7 L803.9,148.0 L793.9,157.0 L789.1,165.0 L785.7,176.0 L784.1,187.0 L783.1,213.0 L791.6,610.0 L792.6,631.0 L794.2,643.0 L797.0,655.2 L801.0,664.0 L805.7,670.0 L812.0,675.0 L818.0,678.4 L829.0,682.4 L845.0,685.8 L870.0,689.7 L873.8,692.0 L874.8,695.0 L874.7,720.0 L874.1,724.0 L872.0,726.0Z M3125.0,728.1 L2920.0,727.1 L2904.0,726.5 L2900.8,725.0 L2899.6,720.0 L2899.4,698.0 L2900.5,695.0 L2904.0,692.4 L2917.6,690.0 L2928.0,686.4 L2935.0,682.1 L2942.0,673.2 L2946.3,659.0 L2948.1,635.0 L2948.2,445.0 L2946.1,424.0 L2942.0,407.4 L2937.7,397.0 L2930.1,385.0 L2922.0,376.6 L2908.7,368.0 L2897.0,363.9 L2882.0,362.3 L2861.0,364.3 L2849.0,367.9 L2840.0,371.7 L2825.0,379.8 L2812.7,388.0 L2809.1,392.0 L2808.1,395.0 L2808.3,623.0 L2809.8,658.0 L2812.5,671.0 L2815.7,678.0 L2820.0,682.8 L2827.0,687.2 L2836.0,690.2 L2850.0,692.5 L2853.5,695.0 L2854.5,698.0 L2854.4,720.0 L2853.0,725.0 L2851.0,726.2 L2847.0,726.6 L2629.0,726.6 L2625.0,725.6 L2623.7,724.0 L2623.2,721.0 L2623.0,699.0 L2623.8,695.0 L2628.0,692.2 L2642.5,690.0 L2658.0,686.4 L2667.0,682.4 L2672.6,678.0 L2677.1,672.0 L2680.4,663.0 L2682.1,654.0 L2683.1,639.0 L2683.1,405.0 L2681.3,385.0 L2677.3,372.0 L2672.3,365.0 L2667.4,361.0 L2658.0,356.6 L2637.0,351.4 L2634.0,349.3 L2633.1,346.0 L2633.0,324.0 L2634.0,320.7 L2638.0,318.5 L2690.0,310.7 L2733.0,302.2 L2782.8,290.0 L2802.0,284.0 L2806.0,283.9 L2807.8,285.0 L2808.6,287.0 L2808.1,348.0 L2809.0,350.5 L2811.0,351.2 L2814.0,350.3 L2857.5,320.0 L2882.9,304.0 L2898.0,295.7 L2920.0,287.9 L2937.0,285.7 L2951.0,285.5 L2975.0,288.1 L2988.0,291.6 L2999.0,295.8 L3007.5,300.0 L3020.0,308.0 L3034.6,321.0 L3042.0,329.8 L3050.0,341.6 L3057.7,356.0 L3061.3,365.0 L3069.2,393.0 L3073.5,430.0 L3073.4,624.0 L3074.4,639.0 L3076.1,650.0 L3080.0,660.3 L3084.2,666.0 L3089.0,670.0 L3099.0,674.3 L3129.0,678.1 L3175.0,678.5 L3187.0,677.2 L3200.0,674.2 L3210.0,670.0 L3215.6,666.0 L3221.3,660.0 L3226.2,651.0 L3227.1,646.0 L3227.2,633.0 L3225.5,624.0 L3221.6,612.0 L3203.0,574.7 L3202.4,570.0 L3202.9,564.0 L3206.9,556.0 L3220.0,540.0 L3233.0,528.3 L3249.8,516.0 L3264.2,508.0 L3274.0,503.8 L3285.0,500.6 L3291.0,499.8 L3301.0,500.7 L3310.0,505.0 L3318.0,513.7 L3322.5,524.0 L3326.2,540.0 L3327.6,552.0 L3326.7,574.0 L3321.9,598.0 L3318.2,611.0 L3313.9,622.0 L3310.0,630.3 L3301.3,645.0 L3288.9,662.0 L3278.0,673.9 L3258.0,690.5 L3240.0,702.1 L3223.0,710.5 L3201.5,718.0 L3182.0,722.7 L3150.0,727.0 L3125.0,728.1Z M1240.0,738.1 L1229.0,737.8 L1213.0,734.8 L1200.0,730.5 L1191.3,726.0 L1181.0,718.4 L1172.0,709.5 L1165.0,700.4 L1156.8,686.0 L1154.0,684.0 L1151.0,684.8 L1125.8,702.0 L1085.7,726.0 L1069.0,734.1 L1059.0,737.5 L1054.0,738.3 L1041.1,738.0 L1021.0,734.9 L1005.0,730.3 L994.6,726.0 L980.0,718.2 L968.5,710.0 L955.6,698.0 L945.6,686.0 L937.7,674.0 L930.0,658.0 L924.8,642.0 L922.4,630.0 L921.4,619.0 L921.8,599.0 L925.4,580.0 L932.7,563.0 L940.0,552.9 L953.0,540.8 L965.0,532.8 L981.0,524.3 L1001.2,516.0 L1086.0,486.0 L1116.0,474.0 L1133.3,466.0 L1146.0,458.4 L1150.0,454.6 L1151.2,451.0 L1151.1,404.0 L1150.1,392.0 L1147.2,377.0 L1143.0,365.0 L1135.8,353.0 L1127.0,344.4 L1119.0,339.7 L1111.0,336.7 L1102.0,335.0 L1085.0,334.8 L1078.7,336.0 L1069.0,340.0 L1060.0,346.3 L1052.9,354.0 L1045.0,367.6 L1037.7,388.0 L1028.3,423.0 L1023.0,433.8 L1018.0,440.1 L1009.9,446.0 L996.5,450.0 L981.0,449.9 L969.0,446.5 L961.0,442.7 L953.0,437.5 L944.4,430.0 L937.9,422.0 L933.6,414.0 L930.7,400.0 L931.4,393.0 L933.3,386.0 L937.0,379.3 L941.9,373.0 L956.1,360.0 L986.6,340.0 L1016.0,323.8 L1040.1,312.0 L1080.8,296.0 L1107.0,288.2 L1120.0,285.7 L1130.0,285.6 L1157.0,288.2 L1175.0,292.4 L1196.0,300.0 L1211.0,307.7 L1223.2,316.0 L1238.0,328.8 L1248.3,341.0 L1256.2,353.0 L1264.4,372.0 L1268.6,388.0 L1271.7,409.0 L1272.5,422.0 L1272.5,605.0 L1274.3,623.0 L1276.9,634.0 L1280.8,643.0 L1285.0,649.0 L1291.0,654.0 L1296.0,656.1 L1301.0,657.4 L1306.0,657.5 L1322.0,654.2 L1329.0,651.2 L1333.7,652.0 L1335.6,655.0 L1343.6,681.0 L1342.8,683.0 L1339.0,686.1 L1240.0,738.1Z M2400.0,738.1 L2377.0,738.1 L2351.0,735.3 L2329.0,730.6 L2315.0,726.1 L2296.0,718.3 L2281.0,710.3 L2264.0,698.7 L2248.0,684.7 L2231.8,667.0 L2223.0,654.9 L2211.0,634.5 L2202.7,616.0 L2195.3,594.0 L2190.8,575.0 L2187.7,554.0 L2186.2,526.0 L2187.2,508.0 L2191.0,481.0 L2198.8,452.0 L2206.3,432.0 L2215.0,413.4 L2226.6,393.0 L2241.0,373.0 L2255.7,356.0 L2272.0,340.6 L2292.0,324.9 L2305.2,316.0 L2328.0,303.9 L2349.0,295.5 L2377.0,288.2 L2401.0,285.6 L2417.0,285.6 L2440.0,287.8 L2455.0,291.4 L2468.7,296.0 L2486.0,303.8 L2499.5,312.0 L2510.6,320.0 L2520.5,329.0 L2534.6,344.0 L2546.0,359.8 L2553.4,373.0 L2561.2,391.0 L2565.2,404.0 L2568.6,421.0 L2569.7,433.0 L2569.7,454.0 L2568.0,466.0 L2565.0,473.0 L2559.7,478.0 L2542.0,481.5 L2484.0,486.1 L2315.0,494.5 L2311.0,495.4 L2309.2,497.0 L2308.8,499.0 L2313.5,534.0 L2319.0,555.0 L2326.7,575.0 L2334.7,590.0 L2343.8,603.0 L2353.0,613.7 L2362.2,622.0 L2373.0,630.0 L2388.0,638.1 L2398.0,642.1 L2412.0,646.0 L2432.0,648.4 L2446.0,648.4 L2462.0,647.0 L2483.0,642.4 L2495.0,638.3 L2512.7,630.0 L2526.7,622.0 L2545.3,608.0 L2548.0,606.8 L2551.0,607.5 L2552.5,609.0 L2565.8,629.0 L2566.5,632.0 L2554.0,649.4 L2539.0,666.9 L2519.0,686.0 L2498.0,702.5 L2478.0,714.5 L2452.0,726.2 L2426.2,734.0 L2400.0,738.1Z M2356.5,446.0 L2435.0,443.4 L2443.0,440.7 L2446.1,438.0 L2448.3,434.0 L2449.3,430.0 L2449.4,415.0 L2448.1,401.0 L2444.2,382.0 L2437.5,363.0 L2430.0,349.6 L2423.0,340.9 L2413.8,333.0 L2404.5,328.0 L2392.0,325.7 L2381.0,326.7 L2374.0,328.6 L2360.2,336.0 L2350.9,344.0 L2342.5,354.0 L2335.0,366.1 L2326.8,384.0 L2318.7,412.0 L2315.2,432.0 L2314.1,442.0 L2314.7,445.0 L2316.0,446.2 L2319.0,446.8 L2356.5,446.0Z M1893.2,697.0 L1907.0,695.0 L1919.0,690.5 L1926.0,686.4 L1935.2,679.0 L1943.5,670.0 L1951.3,659.0 L1956.4,650.0 L1964.3,631.0 L1969.2,615.0 L1973.8,594.0 L1978.3,558.0 L1979.7,513.0 L1976.2,473.0 L1969.7,444.0 L1960.9,420.0 L1950.0,400.0 L1941.8,389.0 L1930.0,376.6 L1919.0,367.9 L1906.0,360.1 L1896.0,355.8 L1883.3,352.0 L1862.0,349.6 L1836.0,351.6 L1820.0,355.7 L1817.4,358.0 L1816.6,361.0 L1816.6,620.0 L1817.9,634.0 L1821.8,650.0 L1826.2,659.0 L1832.1,667.0 L1843.2,678.0 L1854.2,686.0 L1871.2,694.0 L1884.0,696.4 L1893.2,697.0Z M1117.1,663.0 L1126.0,662.0 L1137.0,658.0 L1148.0,650.5 L1150.9,646.0 L1151.4,501.0 L1151.0,499.0 L1149.0,497.3 L1143.0,499.5 L1092.0,527.7 L1073.0,540.4 L1065.0,548.1 L1057.9,558.0 L1053.5,568.0 L1051.6,576.0 L1050.3,591.0 L1053.0,613.2 L1057.7,627.0 L1065.0,638.7 L1076.0,650.2 L1081.0,654.1 L1089.0,658.5 L1101.0,662.5 L1109.0,663.4 L1117.1,663.0Z"/></svg><small id="tag"></small></div>
+    <div class="seg" role="group" id="views"></div>
+    <button class="lang" id="lang"></button>
+  </div>
+</header>
+<main id="app"></main>
+
+<script>
+/* ============================================================
+   CONTENT — edit here. Every text has an English and a Hebrew
+   version: { en: "...", he: "..." }. Add todo: true to show it
+   as "still to fill in".
+   ============================================================ */
+
+const UI = {
+  tag: { en: "Trainee guide", he: "מדריך למתלמדים" },
+  drinks: { en: "Drinks", he: "משקאות" },
+  branches: { en: "Branches", he: "סניפים" },
+  menu: { en: "Menu", he: "תפריט" },
+  cup: { en: "Cup", he: "כוס" },
+  coffee: { en: "Coffee", he: "קפה" },
+  milk: { en: "Milk", he: "חלב" },
+  time: { en: "Time", he: "זמן" },
+  tip: { en: "Tip", he: "טיפ" },
+  stepMode: { en: "Step by step", he: "שלב אחר שלב" },
+  allSteps: { en: "All steps", he: "כל השלבים" },
+  step: { en: "Step", he: "שלב" },
+  of: { en: "of", he: "מתוך" },
+  back: { en: "Back", he: "הקודם" },
+  next: { en: "Next", he: "הבא" },
+  done: { en: "Done", he: "סיום" },
+  info: { en: "Basics", he: "פרטים" },
+  address: { en: "Address", he: "כתובת" },
+  hours: { en: "Hours", he: "שעות" },
+  manager: { en: "Manager", he: "מנהל/ת" },
+  equipment: { en: "Equipment", he: "ציוד" },
+  opening: { en: "Opening the shift", he: "פתיחת משמרת" },
+  closing: { en: "Closing the shift", he: "סגירת משמרת" },
+  special: { en: "What's different here", he: "מה מיוחד בסניף" },
+  baking: { en: "Baking", he: "אפייה" },
+  bakeNote: { en: "All pastries bake at the same temperature, so they can go in together. Take each tray out at its own time.",
+              he: "כל המאפים נאפים באותה טמפרטורה, אפשר להכניס יחד. מוציאים כל מגש בזמן שלו." },
+  oven: { en: "Oven", he: "תנור" },
+  temp: { en: "Temperature", he: "טמפרטורה" },
+  preheat: { en: "Preheat", he: "חימום מראש" },
+  fan: { en: "Fan", he: "מאוורר" },
+  howMany: { en: "How many to bake", he: "כמה לאפות" },
+  bakeTime: { en: "Bake", he: "אפייה" },
+  finish: { en: "Finish", he: "גימור" },
+  ingredients: { en: "Ingredients", he: "מרכיבים" },
+  item: { en: "Pastry", he: "מאפה" },
+  min: { en: "min", he: "דק'" },
+  seeBaking: { en: "Full baking guide", he: "מדריך אפייה מלא" },
+  fifo: { en: "FIFO: first in, first out. Older items are sold first.", he: "FIFO: מה שנכנס ראשון, יוצא ראשון. את הישנים מוכרים קודם." },
+  older: { en: "older", he: "ישן" },
+  newer: { en: "newer", he: "חדש" },
+  branchNote: { en: "Drink recipes are the same in every branch. This page covers what changes from branch to branch.",
+                he: "המתכונים זהים בכל הסניפים. כאן מופיע מה ששונה בין סניף לסניף." }
+};
+
+// Steps shared by many drinks
+const SHOT = [
+  { en: "Take out the portafilter, flush the group head for 2 seconds and wipe the basket dry.", he: "להוציא את הידית, לשטוף את ראש המכונה 2 שניות ולנגב את הסלסלה." },
+  { en: "Grind 18 g of coffee into the basket.", he: "לטחון 18 גרם קפה לתוך הסלסלה." },
+  { en: "Level the grounds and tamp straight and firm.", he: "ליישר את הקפה ולדחוס ישר וחזק." },
+  { en: "Lock the portafilter in and start the shot right away.", he: "להכניס את הידית ולהתחיל את המיצוי מיד." },
+  { en: "Stop at about 36 g of liquid, after 25–30 seconds.", he: "לעצור בכ-36 גרם משקה, אחרי 25–30 שניות." }
+];
+const STEAM = (foam) => [
+  { en: "Fill the pitcher with cold milk up to the bottom of the spout.", he: "למלא את הכד בחלב קר עד תחתית הפייה." },
+  { en: "Purge the steam wand for a second, then put the tip just under the milk surface.", he: "לשחרר אדים מהמקציף לשנייה, ואז להכניס את הקצה ממש מתחת לפני החלב." },
+  foam,
+  { en: "Sink the tip a little deeper so the milk spins, and heat to 60–65°C. The pitcher is too hot to hold for more than 3 seconds.", he: "להוריד את הקצה מעט עמוק יותר כדי שהחלב יסתובב, ולחמם ל-60–65°C. הכד חם מדי להחזקה יותר מ-3 שניות." },
+  { en: "Wipe the wand with the damp cloth and purge it again.", he: "לנגב את המקציף במטלית לחה ולשחרר אדים שוב." },
+  { en: "Tap the pitcher on the counter and swirl until the milk is glossy.", he: "לדפוק את הכד קלות על השיש ולסובב עד שהחלב מבריק." }
+];
+const G = (en, he) => ({ group: true, en, he });
+
+const DRINKS = [
+  {
+    id: "espresso",
+    name: { en: "Espresso", he: "אספרסו" },
+    about: { en: "The base of almost every drink. Get this right first.", he: "הבסיס של כמעט כל משקה. מתחילים מכאן." },
+    cup: { en: "Espresso cup", he: "כוס אספרסו" },
+    coffee: { en: "18 g → 36 g", he: "18 ג' ← 36 ג'" },
+    milk: { en: "None", he: "בלי" },
+    time: { en: "25–30 s", he: "25–30 שנ'" },
+    steps: [...SHOT, { en: "Serve right away with a glass of water.", he: "להגיש מיד עם כוס מים." }],
+    tip: { en: "Running fast and sour: grind finer. Running slow and bitter: grind coarser. Change one step at a time.", he: "יוצא מהר וחמוץ: לטחון דק יותר. יוצא לאט ומר: לטחון גס יותר. לשנות בכל פעם שלב אחד." }
+  },
+  {
+    id: "americano",
+    name: { en: "Americano", he: "אמריקנו" },
+    about: { en: "Espresso poured over hot water.", he: "אספרסו שנמזג מעל מים חמים." },
+    cup: { en: "240 ml", he: "240 מ\"ל" },
+    coffee: { en: "Double shot", he: "כפול" },
+    milk: { en: "On the side if asked", he: "בצד, לפי בקשה" },
+    time: { en: "1 min", he: "דקה" },
+    steps: [
+      { en: "Fill the cup two-thirds with hot water from the machine.", he: "למלא שני שלישים מהכוס במים חמים מהמכונה." },
+      ...SHOT.slice(0, 4),
+      { en: "Let the shot run straight onto the water. This keeps the crema on top.", he: "לתת לאספרסו לרדת ישר על המים. כך הקרמה נשארת למעלה." },
+      { en: "Serve. Offer milk on the side.", he: "להגיש. להציע חלב בצד." }
+    ],
+    tip: { en: "Water first, coffee second. The other way round breaks the crema.", he: "קודם מים, אחר כך קפה. בסדר ההפוך הקרמה נהרסת." }
+  },
+  {
+    id: "cappuccino",
+    name: { en: "Cappuccino", he: "קפוצ'ינו" },
+    about: { en: "Espresso with steamed milk and a thick layer of foam.", he: "אספרסו עם חלב מוקצף ושכבת קצף עבה." },
+    cup: { en: "180 ml", he: "180 מ\"ל" },
+    coffee: { en: "Double shot", he: "כפול" },
+    milk: { en: "60–65°C, thick foam", he: "60–65°C, קצף עבה" },
+    time: { en: "2 min", he: "2 דק'" },
+    steps: [
+      G("Coffee", "קפה"),
+      ...SHOT.slice(0, 4),
+      { en: "Pull the shot straight into the cup.", he: "למצות את האספרסו ישר לכוס." },
+      G("Milk", "חלב"),
+      ...STEAM({ en: "Let air in (a soft “tsss” sound) until the pitcher feels warm, about 5 seconds. Aim for about 1.5 cm of foam.", he: "להכניס אוויר (צליל \"טססס\" רך) עד שהכד מרגיש פושר, כ-5 שניות. המטרה כ-1.5 ס\"מ קצף." }),
+      G("Pour", "מזיגה"),
+      { en: "Pour into the middle of the cup from high up, then bring the pitcher close and finish with the foam.", he: "למזוג למרכז הכוס מגובה, ואז לקרב את הכד ולסיים עם הקצף." }
+    ],
+    tip: { en: "Steam the milk while the shot is running so both are ready together.", he: "להקציף את החלב בזמן שהאספרסו יורד, כדי ששניהם יהיו מוכנים יחד." }
+  },
+  {
+    id: "latte",
+    name: { en: "Latte", he: "לאטה" },
+    about: { en: "Espresso with more milk and a thin layer of foam.", he: "אספרסו עם יותר חלב ושכבת קצף דקה." },
+    cup: { en: "300 ml", he: "300 מ\"ל" },
+    coffee: { en: "Double shot", he: "כפול" },
+    milk: { en: "60–65°C, thin foam", he: "60–65°C, קצף דק" },
+    time: { en: "2 min", he: "2 דק'" },
+    steps: [
+      G("Coffee", "קפה"),
+      ...SHOT.slice(0, 4),
+      { en: "Pull the shot straight into the cup.", he: "למצות את האספרסו ישר לכוס." },
+      G("Milk", "חלב"),
+      ...STEAM({ en: "Let air in only briefly, about 2–3 seconds. Aim for about 1 cm of foam.", he: "להכניס אוויר לזמן קצר בלבד, כ-2–3 שניות. המטרה כ-1 ס\"מ קצף." }),
+      G("Pour", "מזיגה"),
+      { en: "Tilt the cup, pour slowly into the middle and fill to the top.", he: "להטות את הכוס, למזוג לאט למרכז ולמלא עד למעלה." }
+    ],
+    tip: { en: "Glossy milk with no big bubbles. If you see bubbles, tap and swirl more.", he: "חלב מבריק בלי בועות גדולות. אם יש בועות, לדפוק ולסובב עוד." }
+  },
+  {
+    id: "flatwhite",
+    name: { en: "Flat white", he: "פלאט וייט" },
+    about: { en: "Smaller and stronger than a latte, with very thin foam.", he: "קטן וחזק יותר מלאטה, עם קצף דק מאוד." },
+    cup: { en: "180 ml", he: "180 מ\"ל" },
+    coffee: { en: "Double shot", he: "כפול" },
+    milk: { en: "60°C, very thin foam", he: "60°C, קצף דק מאוד" },
+    time: { en: "2 min", he: "2 דק'" },
+    steps: [
+      G("Coffee", "קפה"),
+      ...SHOT.slice(0, 4),
+      { en: "Pull the shot straight into the cup.", he: "למצות את האספרסו ישר לכוס." },
+      G("Milk", "חלב"),
+      ...STEAM({ en: "Let air in for only 1–2 seconds. Aim for about 0.5 cm of foam.", he: "להכניס אוויר לשנייה-שתיים בלבד. המטרה כ-0.5 ס\"מ קצף." }),
+      G("Pour", "מזיגה"),
+      { en: "Pour low and close to the surface so the coffee colour stays visible around the edge.", he: "למזוג נמוך וקרוב לפני השטח, כך שצבע הקפה נשאר נראה בשוליים." }
+    ],
+    tip: { en: "A flat white is about the coffee taste. Keep the milk a little cooler than a latte.", he: "בפלאט וייט טעם הקפה במרכז. לחמם את החלב מעט פחות מבלאטה." }
+  },
+  {
+    id: "macchiato",
+    name: { en: "Macchiato", he: "מקיאטו" },
+    about: { en: "Espresso marked with a spoon of milk foam.", he: "אספרסו עם כף קצף חלב מעל." },
+    cup: { en: "Espresso cup", he: "כוס אספרסו" },
+    coffee: { en: "Double shot", he: "כפול" },
+    milk: { en: "1–2 spoons of foam", he: "1–2 כפות קצף" },
+    time: { en: "1 min", he: "דקה" },
+    steps: [
+      ...SHOT,
+      { en: "Steam a small amount of milk with plenty of foam.", he: "להקציף מעט חלב עם הרבה קצף." },
+      { en: "Spoon 1–2 spoons of foam onto the middle of the shot and serve.", he: "להניח 1–2 כפות קצף במרכז האספרסו ולהגיש." }
+    ],
+    tip: { en: "Never re-steam milk that has already been steamed.", he: "לא מקציפים שוב חלב שכבר הוקצף." }
+  },
+  {
+    id: "icedlatte",
+    name: { en: "Iced latte", he: "אייס לאטה" },
+    about: { en: "Espresso over cold milk and ice.", he: "אספרסו מעל חלב קר וקרח." },
+    cup: { en: "400 ml cold cup", he: "כוס קרה 400 מ\"ל" },
+    coffee: { en: "Double shot", he: "כפול" },
+    milk: { en: "Cold, 200 ml", he: "קר, 200 מ\"ל" },
+    time: { en: "1 min", he: "דקה" },
+    steps: [
+      { en: "Fill the cup with ice to the top.", he: "למלא את הכוס בקרח עד למעלה." },
+      { en: "Pour cold milk to about two-thirds.", he: "למזוג חלב קר עד כשני שלישים." },
+      ...SHOT.slice(0, 4),
+      { en: "Pull the shot into a small pitcher.", he: "למצות את האספרסו לכד קטן." },
+      { en: "Pour the shot slowly over the milk, add a lid and a straw.", he: "למזוג את האספרסו לאט מעל החלב, לסגור במכסה ולהוסיף קש." }
+    ],
+    tip: { en: "Pouring the shot last gives the layered look customers like.", he: "מזיגת האספרסו בסוף יוצרת את השכבות שהלקוחות אוהבים." }
+  },
+  {
+    id: "hotchoc",
+    name: { en: "Hot chocolate", he: "שוקו חם" },
+    about: { en: "Steamed milk with chocolate.", he: "חלב מוקצף עם שוקולד." },
+    cup: { en: "300 ml", he: "300 מ\"ל" },
+    coffee: { en: "None", he: "בלי" },
+    milk: { en: "65°C, thin foam", he: "65°C, קצף דק" },
+    time: { en: "2 min", he: "2 דק'" },
+    steps: [
+      { en: "Add the chocolate to the cup. Amount: fill in Malben's recipe.", he: "לשים את השוקולד בכוס. כמות: להשלים לפי המתכון של מלבן.", todo: true },
+      ...STEAM({ en: "Let air in for 2–3 seconds for a thin foam.", he: "להכניס אוויר 2–3 שניות לקצף דק." }),
+      { en: "Pour a little milk and stir until the chocolate is smooth, then pour the rest.", he: "למזוג מעט חלב ולערבב עד שהשוקולד חלק, ואז למזוג את השאר." }
+    ],
+    tip: { en: "Stir before topping up, or the chocolate stays at the bottom.", he: "לערבב לפני שממלאים, אחרת השוקולד נשאר בתחתית." }
+  }
+];
+
+const TODO = (en, he) => ({ en, he, todo: true });
+
+const OVEN = {
+  temp: "165°C",
+  preheat: { en: "5 min", he: "5 דק'" },
+  fan: { en: "1", he: "1" },
+  photos: TODO("Oven photos coming", "תמונות של התנור יתווספו בהמשך"),
+  howMany: { en: "Limor sends how many of each pastry to bake on WhatsApp every morning.", he: "לימור שולחת בוואטסאפ כל בוקר כמה לאפות מכל מאפה." }
+};
+
+const BAKING = [
+  { name: { en: "Rugelach", he: "רוגלך" }, time: "23",
+    finish: { en: "Pour sugar water over the top", he: "לשפוך מי סוכר מלמעלה" } },
+  { name: { en: "Cinnabon", he: "סינבון" }, time: "15–17",
+    finish: { en: "Pour sugar water over the top", he: "לשפוך מי סוכר מלמעלה" } },
+  { name: { en: "Burekas", he: "בורקס" }, time: "15",
+    finish: { en: "Nothing", he: "בלי" } },
+  { name: { en: "Almond croissant", he: "קרואסון שקדים" }, time: "13",
+    finish: { en: "Sprinkle powdered sugar", he: "לפזר אבקת סוכר" } }
+];
+
+// Same in Katzenelson 50 and 135. For Weizman later: music outside too.
+const SEATING = { title: { en: "Seating area", he: "אזור ישיבה" },
+    items: [
+      { en: "<b>Outside.</b> Unlock the locks and take out the chains. Roll the chains up neatly, close them with the lock and put them back in their place.", he: "<b>בחוץ.</b> לפתוח את המנעולים ולהוציא את השרשראות. לגלגל אותן מסודר, לסגור עם המנעול ולהניח במקום." },
+      { en: "<b>Tables and chairs.</b> Open the tables and set the chairs evenly and neatly at every table.", he: "<b>סידור ישיבה.</b> לפתוח שולחנות ולסדר כיסאות באופן אחיד ומסודר בין כל השולחנות." },
+      { en: "<b>Cleaning.</b> Wipe every table. Pick up anything on the floor, and sweep if needed.", he: "<b>ניקיון.</b> מגבון על כל השולחנות. הרמת מפגעים מהרצפה, וטיאוט במקרה הצורך." },
+      { en: "<b>Ashtrays.</b> Put them out in the smoking area only.", he: "<b>מאפרות.</b> לפזר באזור העישון בלבד." },
+      { en: "<b>Sugar station.</b> Make sure it is clean and ready for the shift. Set out everything it needs and check it is all full:", he: "<b>עמדת סוכרים.</b> לוודא שהעמדה נקייה ומוכנה למשמרת. לסדר בעמדה כל מה שצריך ולוודא שהכול מלא:",
+        groups: [
+          { label: { en: "Refill", he: "למלא" }, chips: [{ en: "Lids", he: "מכסים" }, { en: "Napkins", he: "מפיות" }, { en: "Wet wipes", he: "מגבונים" }, { en: "Etc.", he: "וכו׳" }] }
+        ] },
+      { en: "<b>Umbrellas, heaters and fans.</b> Open the umbrellas. Take out and turn on the heaters or fans (heaters in winter).", he: "<b>שמשיות ומאווררים.</b> לפתוח שמשיות. להוציא ולהדליק תנורים/מאווררים (תנורים בחורף)." },
+      { en: "<b>Music.</b> Turn on the music.", he: "<b>מוזיקה.</b> להדליק מוזיקה." }
+    ] };
+
+const CASHIER = { title: { en: "Cashier", he: "קופה" },
+  items: [
+    { en: "<b>Cash float.</b> Bring the float from the safe, count the money and arrange it in the register. It must come to exactly <b>₪1,000</b>.", he: "<b>קרן.</b> להביא מהכספת את הקרן, לספור את הכסף ולסדר אותו בקופה. לוודא שיוצא <b>1,000 ש״ח</b> בדיוק." },
+    { en: "<b>Beecomm.</b> On the iPad, open the Beecomm app and tap <b>פתיחת קופה</b> (Open register).", he: "<b>ביקום.</b> לפתוח באייפד את האפליקציה של ביקום וללחוץ על <b>פתיחת קופה</b>." },
+    { en: "<b>Opening report.</b> Send the opening report to the group, using the template:", he: "<b>דוח פתיחה.</b> לשלוח בקבוצה דוח פתיחה לפי התבנית:",
+      sub: [
+        { en: "A photo of the display case (vitrina)", he: "צילום ויטרינה" },
+        { en: "Anything unusual, if there is", he: "דברים חריגים, אם יש" },
+        { en: "Notes for the closing shift, if there were any", he: "הערות לסגירה, אם היו" }
+      ] }
+  ] };
+
+const OPENING_K50 = [
+  { title: { en: "Arrive", he: "הגעה" },
+    items: [
+      { en: "Take the key from the locker on the left of the entrance. Get the code from your shift manager.", he: "לקחת את המפתח מהלוקר משמאל לכניסה. את הקוד מקבלים מהאחראי/ת משמרת." },
+      { en: "Clock in: tap your phone on the Beecomm NFC sticker on the wall.", he: "להיכנס למערכת: להצמיד את הטלפון למדבקת ה-NFC של Beecomm על הקיר." }
+    ] },
+  { title: { en: "Display case (vitrina)", he: "ויטרינה" },
+    fifo: true,
+    items: [
+      { en: "<b>Sandwiches.</b> First put yesterday's sandwiches from the vitrina box into the display, then fill the rest with new ones.", he: "<b>כריכים.</b> קודם להכניס לוויטרינה את הכריכים שנשארו בקופסת הוויטרינה, ואז להשלים בכריכים חדשים." },
+      { rule: true, en: "We sell from right to left", he: "מוכרים מימין לשמאל", a: { en: "Right", he: "ימין" }, b: { en: "Left", he: "שמאל" } },
+      { en: "<b>Desserts.</b> Put the leftover desserts from the box into the display first.", he: "<b>קינוחים.</b> קודם להכניס לוויטרינה את הקינוחים שנשארו בקופסה." },
+      { rule: true, en: "", he: "", a: { en: "Door side", he: "צד הדלת" }, b: { en: "Window side", he: "צד החלון" } }
+    ] },
+  { title: { en: "Bake the pastries", he: "אפיית מאפים" },
+    bake: true,
+    items: [
+      { en: "Turn on the oven: 165°C, fan on 1, heat for 5 minutes.", he: "להדליק את התנור: 165°C, מאוורר על 1, לחמם 5 דקות." },
+      { en: "Check Limor's WhatsApp message for how many to bake.", he: "לבדוק בהודעת הוואטסאפ של לימור כמה לאפות." },
+      { en: "Bake, take each tray out on time, finish and put on its tray:", he: "לאפות, להוציא כל מגש בזמן, לעשות גימור ולהניח על המגש שלו:" }
+    ] },
+  { title: { en: "Coffee station", he: "עמדת קפה" },
+    items: [
+      { en: "<b>Group heads.</b> Pull two double shots from each group head.", he: "<b>ראשים.</b> להוריד שתי מנות כפולות מכל ראש." },
+      { en: "<b>Steam wands.</b> Open each steam wand for a few seconds to release the pressure, then wipe it with a clean cloth.", he: "<b>סטימרים.</b> לפתוח כל סטימר לכמה שניות כדי לשחרר לחץ, ואז לנגב עם סמרטוט נקי." },
+      { en: "<b>Take out of the fridges:</b>", he: "<b>להוציא מהמקררים:</b>",
+        groups: [
+          { label: { en: "Milks", he: "חלבים" }, chips: [{ en: "Regular", he: "רגיל" }, { en: "Low-fat", he: "דל" }, { en: "Almond", he: "שקדים" }, { en: "Soy", he: "סויה" }, { en: "Oat", he: "שיבולת" }] },
+          { label: { en: "Drinks", he: "משקאות" }, chips: [{ en: "Iced tea", he: "תה קר" }] },
+          { label: { en: "Syrups", he: "סירופים" }, chips: [{ en: "Vanilla", he: "וניל" }, { en: "Strawberry", he: "תות" }, { en: "Caramel", he: "קרמל" }] },
+          { label: { en: "Garnishes", he: "גרנישים" }, chips: [{ en: "If there are any", he: "אם יש" }] }
+        ] },
+      { en: "<b>Garnish station.</b> Fill it up so everything is ready to use:", he: "<b>עמדת גרנישים.</b> למלא כך שהכול מוכן לשימוש:",
+        sub: [
+          { en: "Cinnamon sticks: refill", he: "מקלות קינמון: למלא" },
+          { en: "Lemon: slice", he: "לימון: לחתוך" },
+          { en: "Mint: pick the leaves apart and cut into neat sprigs", he: "נענע: להפריד ולחתוך לתפרחות יפות" }
+        ] }
+    ] },
+  SEATING,
+  CASHIER
+];
+const BRANCH_TEMPLATE = () => ({
+  address: TODO("Add address", "להוסיף כתובת"),
+  hours: TODO("Add opening hours", "להוסיף שעות פתיחה"),
+  manager: TODO("Add name and phone", "להוסיף שם וטלפון"),
+  equipment: [
+    TODO("Espresso machine model", "דגם מכונת האספרסו"),
+    TODO("Grinder model and setting", "דגם המטחנה וכיוון הטחינה"),
+    TODO("Where milk, cups and syrups are kept", "איפה נמצאים החלב, הכוסות והסירופים")
+  ],
+  opening: [
+    { en: "Turn on the espresso machine at least 30 minutes before opening.", he: "להדליק את מכונת האספרסו לפחות 30 דקות לפני הפתיחה." },
+    { en: "Pull a test shot and check the timing (25–30 s).", he: "למצות אספרסו לבדיקה ולבדוק את הזמן (25–30 שנ')." },
+    { en: "Stock milk, cups and lids.", he: "להשלים חלב, כוסות ומכסים." },
+    { en: "Count the cash drawer.", he: "לספור את הקופה." },
+    TODO("Add steps that are specific to this branch", "להוסיף שלבים שמיוחדים לסניף")
+  ],
+  closing: [
+    { en: "Backflush the group heads and soak the portafilters.", he: "לבצע שטיפה הפוכה לראשי המכונה ולהשרות את הידיות." },
+    { en: "Clean the steam wands and empty the drip tray.", he: "לנקות את המקציפים ולרוקן את מגש הניקוז." },
+    { en: "Put milk back in the fridge and write down what needs ordering.", he: "להחזיר חלב למקרר ולרשום מה צריך להזמין." },
+    TODO("Add steps that are specific to this branch", "להוסיף שלבים שמיוחדים לסניף")
+  ],
+  special: [
+    TODO("For example: seating area, delivery times, alarm code location", "לדוגמה: אזור ישיבה, שעות משלוחים, איפה קוד האזעקה")
+  ]
+});
+
+const BRANCHES = [
+  { name: { en: "Katzenelson 50", he: "כצנלסון 50" }, ...BRANCH_TEMPLATE(),
+    opening: OPENING_K50,
+    address: { en: "Katzenelson 50, Givatayim", he: "כצנלסון 50, גבעתיים" },
+    hours: [
+      { day: { en: "Sun–Thu", he: "א׳–ה׳" }, time: "07:30–19:00" },
+      { day: { en: "Fri", he: "ו׳" }, time: "07:30–16:00" },
+      { day: { en: "Sat", he: "שבת" }, time: "08:00–15:00" }
+    ] },
+  { name: { en: "Katzenelson 135", he: "כצנלסון 135" }, ...BRANCH_TEMPLATE(),
+    opening: [
+      { title: { en: "Before the seating area", he: "לפני אזור הישיבה" }, items: [ TODO("Steps for this branch to be added", "השלבים של הסניף יתווספו בהמשך") ] },
+      SEATING
+    ],
+    address: { en: "Katzenelson 135, Givatayim", he: "כצנלסון 135, גבעתיים" },
+    hours: [
+      { day: { en: "Sun–Thu", he: "א׳–ה׳" }, time: "07:30–19:00" },
+      { day: { en: "Fri", he: "ו׳" }, time: "07:30–16:00" },
+      { day: { en: "Sat", he: "שבת" }, time: "08:00–15:00" }
+    ] },
+  { name: { en: "Weizman 51", he: "ויצמן 51" }, ...BRANCH_TEMPLATE(),
+    address: { en: "Weizman 51, Givatayim", he: "ויצמן 51, גבעתיים" },
+    hours: [
+      { day: { en: "Sun–Thu", he: "א׳–ה׳" }, time: "07:30–18:00" },
+      { day: { en: "Fri", he: "ו׳" }, time: "07:30–16:00" },
+      { day: { en: "Sat", he: "שבת" }, time: "08:00–15:00" }
+    ] }
+];
+
+/* ============================================================
+   APP
+   ============================================================ */
+const store = {
+  get(k, d) { try { const v = localStorage.getItem("malben." + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem("malben." + k, JSON.stringify(v)); } catch (e) {} }
+};
+const S = {
+  lang: store.get("lang", "he"),
+  view: store.get("view", "drinks"),
+  drink: store.get("drink", "espresso"),
+  branch: store.get("branch", 0),
+  stepMode: false,
+  step: 0
+};
+const t = (o) => o[S.lang];
+const txt = (o) => o.todo ? `<span class="todo">${t(o)}</span>` : t(o);
+const app = document.getElementById("app");
+
+function save() { ["lang", "view", "drink", "branch"].forEach(k => store.set(k, S[k])); }
+
+function renderBar() {
+  document.documentElement.lang = S.lang;
+  document.documentElement.dir = S.lang === "he" ? "rtl" : "ltr";
+  document.getElementById("tag").textContent = t(UI.tag);
+  const lb = document.getElementById("lang");
+  lb.textContent = S.lang === "he" ? "English" : "עברית";
+  lb.setAttribute("lang", S.lang === "he" ? "en" : "he");
+  document.getElementById("views").innerHTML = ["drinks", "baking", "branches"].map(v =>
+    `<button data-view="${v}" aria-pressed="${S.view === v}">${t(UI[v])}</button>`).join("");
+}
+
+function renderDrinks() {
+  const d = DRINKS.find(x => x.id === S.drink) || DRINKS[0];
+  const steps = d.steps.filter(s => !s.group);
+  const list = DRINKS.map(x =>
+    `<button class="item" data-drink="${x.id}" aria-current="${x.id === d.id}"><span>${t(x.name)}</span><span>${t(x.cup)}</span></button>`).join("");
+  const specs = ["cup", "coffee", "milk", "time"].map(k =>
+    `<div class="spec"><dt>${t(UI[k])}</dt><dd>${t(d[k])}</dd></div>`).join("");
+
+  let body;
+  if (S.stepMode) {
+    const i = Math.min(S.step, steps.length - 1);
+    const last = i === steps.length - 1;
+    body = `<div class="focus" aria-live="polite">
+      <div class="focus-count">${t(UI.step)} ${i + 1} ${t(UI.of)} ${steps.length}</div>
+      <p class="focus-text">${txt(steps[i])}</p>
+      <div class="dots">${steps.map((_, j) => `<i class="${j <= i ? "on" : ""}"></i>`).join("")}</div>
+      <div class="focus-nav">
+        <button class="btn ghost" data-step="-1" ${i === 0 ? "disabled" : ""}>${t(UI.back)}</button>
+        <button class="btn" data-step="${last ? "done" : 1}">${last ? t(UI.done) : t(UI.next)}</button>
+      </div>
+    </div>`;
+  } else {
+    body = `<ol class="steps">${d.steps.map(s => s.group
+      ? `<li class="group"><h3>${t(s)}</h3></li>`
+      : `<li><p>${txt(s)}</p></li>`).join("")}</ol>
+      <div class="tip"><strong>${t(UI.tip)}:</strong> ${t(d.tip)}</div>`;
+  }
+
+  app.innerHTML = `<div class="drinks">
+    <nav class="list" aria-label="${t(UI.menu)}"><h2>${t(UI.menu)}</h2>${list}</nav>
+    <article class="card">
+      <div class="card-head">
+        <h2>${t(d.name)}</h2>
+        <button class="btn ghost" data-mode>${S.stepMode ? t(UI.allSteps) : t(UI.stepMode)}</button>
+      </div>
+      <p class="lede">${t(d.about)}</p>
+      <dl class="specs">${specs}</dl>
+      ${body}
+    </article>
+  </div>`;
+}
+
+const bakeTable = () => `<div class="tbl"><table class="bake">
+  <thead><tr><th>${t(UI.item)}</th><th>${t(UI.bakeTime)}</th><th>${t(UI.finish)}</th></tr></thead>
+  <tbody>${BAKING.map(x => `<tr><td>${t(x.name)}</td><td class="num"><bdi dir="ltr">${x.time}</bdi> ${t(UI.min)}</td><td>${t(x.finish)}</td></tr>`).join("")}</tbody>
+</table></div>`;
+
+function renderBaking() {
+  const spec = (k, v) => `<div class="spec"><dt>${t(UI[k])}</dt><dd>${v}</dd></div>`;
+  app.innerHTML = `
+    <p class="note">${t(UI.bakeNote)}</p>
+    <div class="sheet">
+      <section class="card"><h3>${t(UI.oven)}</h3>
+        <dl class="specs three">${spec("temp", `<bdi dir="ltr">${OVEN.temp}</bdi>`)}${spec("preheat", t(OVEN.preheat))}${spec("fan", t(OVEN.fan))}</dl>
+        <p class="small">${txt(OVEN.photos)}</p>
+      </section>
+      <section class="card"><h3>${t(UI.howMany)}</h3><p class="flush">${t(OVEN.howMany)}</p></section>
+      <section class="card wide">${bakeTable()}</section>
+      ${BAKING.map(x => `<section class="card"><div class="pastry-head"><h3>${t(x.name)}</h3><span class="pill"><bdi dir="ltr">${x.time}</bdi> ${t(UI.min)}</span></div>
+        <p class="flush"><b>${t(UI.finish)}:</b> ${t(x.finish)}</p>
+        <p class="flush"><b>${t(UI.ingredients)}:</b> ${txt(TODO("To be added", "יתווספו בהמשך"))}</p></section>`).join("")}
+    </div>`;
+}
+
+function renderOpening(phases) {
+  const rule = (r) => `<div class="rule">${r.en ? `<span>${t(r)}:</span>` : ""}
+    <span class="chip"><b>${t(r.a)}</b> = ${t(UI.older)}</span><span class="chip ghost"><b>${t(r.b)}</b> = ${t(UI.newer)}</span></div>`;
+  return `<ol class="phases">${phases.map(ph => `<li>
+    <h4>${t(ph.title)}${ph.fifo ? ` <span class="tag">FIFO</span>` : ""}</h4>
+    <ul class="checks">${ph.items.map(x => x.rule ? `<li class="plain">${rule(x)}</li>` : `<li>${txt(x)}${x.groups ? `<dl class="pick">${x.groups.map(g => `<dt>${t(g.label)}</dt><dd>${g.chips.map(c => `<span class="chip ghost">${t(c)}</span>`).join("")}</dd>`).join("")}</dl>` : ""}${x.sub ? `<ul class="sub">${x.sub.map(s => `<li>${txt(s)}</li>`).join("")}</ul>` : ""}</li>`).join("")}</ul>
+    ${ph.fifo ? `<p class="small">${t(UI.fifo)}</p>` : ""}
+    ${ph.bake ? bakeTable() + `<button class="btn ghost sm" data-view="baking">${t(UI.seeBaking)}</button>` : ""}
+  </li>`).join("")}</ol>`;
+}
+
+function renderBranches() {
+  const b = BRANCHES[S.branch] || BRANCHES[0];
+  const pick = BRANCHES.map((x, i) =>
+    `<button class="btn ${i === S.branch ? "" : "ghost"}" data-branch="${i}" aria-pressed="${i === S.branch}">${t(x.name)}</button>`).join("");
+  const ul = (arr, tag = "ul") => `<${tag} class="checks">${arr.map(x => `<li>${txt(x)}</li>`).join("")}</${tag}>`;
+  app.innerHTML = `
+    <p class="note">${t(UI.branchNote)}</p>
+    <div class="branch-pick">${pick}</div>
+    <div class="sheet">
+      <section class="card"><h3>${t(UI.info)}</h3>
+        <dl class="facts">
+          <dt>${t(UI.address)}</dt><dd>${txt(b.address)}</dd>
+          <dt>${t(UI.hours)}</dt><dd>${Array.isArray(b.hours) ? `<table class="hours">${b.hours.map(r => `<tr><th>${t(r.day)}</th><td dir="ltr">${r.time}</td></tr>`).join("")}</table>` : txt(b.hours)}</dd>
+          <dt>${t(UI.manager)}</dt><dd>${txt(b.manager)}</dd>
+        </dl>
+      </section>
+      <section class="card"><h3>${t(UI.equipment)}</h3>${ul(b.equipment)}</section>
+      <section class="card wide"><h3>${t(UI.opening)}</h3>${b.opening[0] && b.opening[0].items ? renderOpening(b.opening) : ul(b.opening, "ol")}</section>
+      <section class="card"><h3>${t(UI.closing)}</h3>${ul(b.closing, "ol")}</section>
+      <section class="card"><h3>${t(UI.special)}</h3>${ul(b.special)}</section>
+    </div>`;
+}
+
+function render() {
+  renderBar();
+  if (S.view === "branches") renderBranches();
+  else if (S.view === "baking") renderBaking();
+  else renderDrinks();
+}
+
+document.addEventListener("click", (e) => {
+  const el = e.target.closest("button");
+  if (!el) return;
+  if (el.id === "lang") S.lang = S.lang === "he" ? "en" : "he";
+  else if (el.dataset.view) S.view = el.dataset.view;
+  else if (el.dataset.drink) { S.drink = el.dataset.drink; S.step = 0; }
+  else if (el.dataset.branch) S.branch = +el.dataset.branch;
+  else if ("mode" in el.dataset) { S.stepMode = !S.stepMode; S.step = 0; }
+  else if (el.dataset.step) {
+    if (el.dataset.step === "done") { S.stepMode = false; S.step = 0; }
+    else S.step = Math.max(0, S.step + +el.dataset.step);
+  } else return;
+  save();
+  render();
+});
+
+render();
+</script>
+<script>
+if ("serviceWorker" in navigator) {
+  addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
+}
+</script>
+</body>
+</html>

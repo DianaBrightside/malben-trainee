@@ -1,5 +1,5 @@
 מדריך מלבן למתלמדים 📲
-קישור: [LINK]
+קישור: https://dianabrightside.github.io/malben-trainee/
 
 איך מתקינים:
 • אייפון: לפתוח בספארי ← כפתור שיתוף ← "הוספה למסך הבית"
@@ -11,7 +11,7 @@
 ---
 
 Malben trainee guide 📲
-Link: [LINK]
+Link: https://dianabrightside.github.io/malben-trainee/
 
 How to install:
 • iPhone: open in Safari → Share → "Add to Home Screen"

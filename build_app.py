@@ -1,21 +1,20 @@
-"""Build the installable Malben Trainee web app from malben-trainee.html.
+"""Build the public website (docs/) from malben-trainee.html.
 
 Run:  python3 build_app.py
-Then drag the "app" folder onto https://app.netlify.com/drop (or your site's Deploys page).
+GitHub Pages serves docs/ at https://dianabrightside.github.io/malben-trainee/
 """
-import json, os, re, shutil, subprocess, tempfile, time
+import hashlib, json, os, shutil, subprocess, tempfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SRC = os.path.join(HERE, "malben-trainee.html")
 LOGO = os.path.join(HERE, "Malben_logo.svg")
-OUT = os.path.join(HERE, "app")
+OUT = os.path.join(HERE, "docs")
 CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 GREEN, BEIGE = "#005357", "#E3DABB"
 
 page = open(SRC, encoding="utf-8").read()
 split = page.index('<header class="bar">')
 head_part, body_part = page[:split], page[split:]
-version = time.strftime("%Y%m%d%H%M%S")
 
 index = f"""<!doctype html>
 <html lang="he" dir="rtl">
@@ -50,6 +49,9 @@ if ("serviceWorker" in navigator) {{
 </body>
 </html>
 """
+
+# Changes only when the page changes, so phones re-download only after a real update.
+version = hashlib.sha1(index.encode("utf-8")).hexdigest()[:12]
 
 manifest = {
     "name": "Malben Trainee",
@@ -95,21 +97,11 @@ self.addEventListener("fetch", e => {{
 }});
 """
 
-netlify = """[[headers]]
-  for = "/*"
-  [headers.values]
-    X-Robots-Tag = "noindex, nofollow"
-[[headers]]
-  for = "/sw.js"
-  [headers.values]
-    Cache-Control = "no-cache"
-"""
-
 if os.path.isdir(OUT):
     shutil.rmtree(OUT)
 os.makedirs(OUT)
 for name, text in [("index.html", index), ("manifest.webmanifest", json.dumps(manifest, ensure_ascii=False, indent=2)),
-                   ("sw.js", sw), ("netlify.toml", netlify), ("robots.txt", "User-agent: *\nDisallow: /\n")]:
+                   ("sw.js", sw)]:
     with open(os.path.join(OUT, name), "w", encoding="utf-8") as f:
         f.write(text)
 

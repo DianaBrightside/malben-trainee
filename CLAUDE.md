@@ -2,8 +2,11 @@
 
 A bilingual (Hebrew/English) training guide for new staff at Malben's three coffee shops in Givatayim. It covers drink tutorials (shared by all branches), a baking page, and per-branch details (hours, opening routine, and so on).
 
-- **Source:** `malben-trainee.html`, a single self-contained page (HTML + CSS + JS, no build step).
-- **Live page:** https://claude.ai/artifact/NqYYTLTZ8xkNiK4gMdktvr (private; the owner shares it from the page's Share menu). Publish changes with the Artifact tool using `malben-trainee.html` as the file path and that URL, so the link stays the same.
+- **Source:** `malben-trainee.html`, a single self-contained page (HTML + CSS + JS). Edit only this file.
+- **Public site:** https://dianabrightside.github.io/malben-trainee/ served by GitHub Pages from `docs/` on `main` of the public repo `DianaBrightside/malben-trainee`. Anyone with the link can open it, so nothing private goes in the page or the repo.
+- **Build:** `python3 build_app.py` turns the source into `docs/` (a full web page plus manifest, icons and an offline service worker, so it can be added to a phone's home screen). It needs Google Chrome installed, which draws the icons. Commit `docs/` together with the source change, then push; the site updates in a minute or two.
+- **claude.ai copy:** https://claude.ai/artifact/NqYYTLTZ8xkNiK4gMdktvr (private). Republish it with the Artifact tool using `malben-trainee.html` and that URL so the link stays the same.
+- `Install message for trainees.txt`: ready-to-paste WhatsApp message with the link and home-screen install steps.
 - **Brand:** green `#005357` (logo, headings, buttons), beige `#E3DABB` (background). Logo is `Malben_logo.svg`, inlined into the page header with `fill="currentColor"`.
 
 ## How the content is organised
@@ -18,11 +21,9 @@ All content lives in the data section at the top of the page's `<script>`, above
 
 Keep the locker code and other access codes out of the page.
 
-`app/`, `build_app.py`, `malben-app.zip` and `Install message for trainees.txt` are from an installable-app idea that was dropped. They are not used.
-
 ## Checks
 
-Run from the project folder. Both must print `PASS`.
+Run from the project folder, after committing. All must print `PASS`.
 
 ```sh
 # 1. The page's script has no syntax errors
@@ -32,6 +33,9 @@ sed -n '/<script>/,/<\/script>/p' malben-trainee.html | sed '1d;$d' | node --che
 "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new --disable-gpu \
   --user-data-dir="$(mktemp -d)" --virtual-time-budget=3000 --dump-dom "file://$PWD/malben-trainee.html" 2>/dev/null \
   | grep -q 'class="steps"' && echo PASS || echo FAIL
+
+# 3. docs/ is built from the current source (fails if the build changes anything not yet committed)
+python3 build_app.py > /dev/null && { [ -z "$(git status --porcelain docs)" ] && echo PASS || echo "FAIL: docs/ out of date"; }
 ```
 
 ## Sharp edges
