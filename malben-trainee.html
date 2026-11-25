@@ -136,6 +136,15 @@ code { font-family: ui-monospace, "SF Mono", Menlo, monospace; background: var(-
 .pastry-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px; }
 .pastry-head h3 { margin: 0; }
 .pill { background: var(--accent); color: var(--accent-ink); border-radius: 999px; padding: 1px 12px; font-size: 14px; font-weight: 700; white-space: nowrap; }
+.panel { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 28px; }
+.pgroup h4 { margin: 0 0 8px; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.pgroup dl, .progs { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 10px 12px; margin: 0; align-items: start; }
+.pgroup dd, .progs dd { margin: 0; min-width: 0; }
+.keycap { display: inline-flex; align-items: center; justify-content: center; min-width: 40px; height: 30px; padding: 0 9px; border-radius: 6px; background: #1b1b1b; color: #f2f2f2; font-weight: 700; font-size: 13px; letter-spacing: .04em; white-space: nowrap; }
+.keycap.ico svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+dt.warn .keycap { background: var(--todo-ink); color: var(--todo-bg); }
+dd.warn { font-weight: 700; color: var(--todo-ink); background: var(--todo-bg); padding: 4px 8px; border-radius: 4px; }
+.progs { grid-template-columns: max-content minmax(0, 1fr) max-content minmax(0, 1fr); gap: 8px 10px; align-items: center; }
 .note { font-size: 15px; color: var(--muted); margin: 0 0 16px; max-width: 70ch; }
 
 @media (max-width: 760px) {
@@ -151,6 +160,8 @@ code { font-family: ui-monospace, "SF Mono", Menlo, monospace; background: var(-
   .spec:nth-child(3) { border-inline-start: 0; padding-inline-start: 0; }
   .spec:nth-child(n+3) { border-top: 1px solid var(--line); }
   .sheet { grid-template-columns: minmax(0, 1fr); }
+  .panel { grid-template-columns: minmax(0, 1fr); }
+  .progs { grid-template-columns: max-content minmax(0, 1fr); }
   .card { padding: 20px; }
   .card-head h2 { font-size: 26px; }
   .focus-text { font-size: 22px; }
@@ -211,6 +222,9 @@ const UI = {
   preheat: { en: "Preheat", he: "חימום מראש" },
   fan: { en: "Fan", he: "מאוורר" },
   howMany: { en: "How many to bake", he: "כמה לאפות" },
+  panel: { en: "Oven buttons", he: "כפתורי התנור" },
+  programs: { en: "Saved programs", he: "תוכניות שמורות" },
+  useProgram: { en: "Baking with a saved program", he: "אפייה עם תוכנית שמורה" },
   bakeTime: { en: "Bake", he: "אפייה" },
   finish: { en: "Finish", he: "גימור" },
   ingredients: { en: "Ingredients", he: "מרכיבים" },
@@ -385,6 +399,46 @@ const OVEN = {
   photos: TODO("Oven photos coming", "תמונות של התנור יתווספו בהמשך"),
   howMany: { en: "Limor sends how many of each pastry to bake on WhatsApp every morning.", he: "לימור שולחת בוואטסאפ כל בוקר כמה לאפות מכל מאפה." }
 };
+
+// Unox BAKERLUX SHOP.Pro LED panel, from the Unox operation manual.
+const I = {
+  clock: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 12V7M12 12l-4 3"/></svg>',
+  temp: '<svg viewBox="0 0 24 24"><path d="M12 3v12"/><circle cx="12" cy="18" r="3"/></svg>',
+  steam: '<svg viewBox="0 0 24 24"><path d="M6 20c-2-3 2-5 0-8M11 20c-2-3 2-5 0-8M16 20c-2-3 2-5 0-8M14 7l6-4"/></svg>',
+  fan: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 12c0-4 2-6 4-5M12 12c4 0 6 2 5 4M12 12c0 4-2 6-4 5M12 12c-4 0-6-2-5-4"/></svg>',
+  oven: '<svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18"/><path d="M5 9h14M12 9v12"/></svg>',
+  prover: '<svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18"/><path d="M5 13h14M12 13v8"/></svg>'
+};
+const PANEL = [
+  { group: { en: "Steps", he: "שלבים" }, keys: [
+    { key: "PRE", en: "Preheat. Heats the empty oven before baking. Don't put food in yet.", he: "חימום מראש. מחמם את התנור הריק לפני האפייה. לא מכניסים אוכל בשלב הזה." },
+    { key: "1 · 2 · 3", en: "Baking steps. A bake can have 1 to 3 steps, each with its own time, temperature, steam and fan. The oven moves from one step to the next by itself.", he: "שלבי אפייה. לאפייה יכולים להיות 1 עד 3 שלבים, לכל אחד זמן, טמפרטורה, אדים ומאוורר משלו. התנור עובר משלב לשלב לבד." }
+  ] },
+  { group: { en: "Setting values", he: "שינוי ערכים" }, keys: [
+    { key: "−  +", en: "Lower or raise the value shown on the display. You can also slide your finger along the display to change it faster.", he: "מורידים או מעלים את הערך שעל המסך. אפשר גם להחליק אצבע על המסך כדי לשנות מהר יותר." },
+    { icon: "clock", en: "Time, in hours.minutes (00.15 = 15 minutes). While baking it shows the time left.", he: "זמן, בשעות.דקות (00.15 = 15 דקות). בזמן אפייה מראה כמה זמן נשאר." },
+    { icon: "temp", en: "Temperature. While baking it switches between the set and the actual temperature.", he: "טמפרטורה. בזמן אפייה מתחלף בין הטמפרטורה שנקבעה לטמפרטורה בפועל." },
+    { icon: "steam", en: "Steam: how much moisture goes into the oven, 0% to 100% in steps of 20.", he: "אדים: כמה לחות נכנסת לתנור, 0% עד 100% בקפיצות של 20." },
+    { icon: "fan", en: "Fan speed: 1 = slow, 2 = full. We bake on 1.", he: "מהירות מאוורר: 1 = איטי, 2 = מלא. אנחנו אופים על 1." }
+  ] },
+  { group: { en: "Programs", he: "תוכניות" }, keys: [
+    { key: "P1 – P12", en: "Saved programs. A lit red line under a P button means a program is saved there. P12 also leads to programs 13–99 with the + button.", he: "תוכניות שמורות. קו אדום דולק מתחת לכפתור P אומר שיש בו תוכנית. דרך P12 מגיעים גם לתוכניות 13–99 עם כפתור +." },
+    { key: "P", warn: true, en: "Never hold a P button for 5 seconds. That saves the current settings over the program and deletes it.", he: "אף פעם לא להחזיק כפתור P במשך 5 שניות. זה שומר את ההגדרות הנוכחיות על התוכנית ומוחק אותה." }
+  ] },
+  { group: { en: "Bottom row", he: "שורה תחתונה" }, keys: [
+    { icon: "oven", en: "Oven: makes the panel control the oven. It must be selected when baking.", he: "תנור: הלוח שולט בתנור. צריך להיות נבחר בזמן אפייה." },
+    { key: "START / STOP", en: "Press to start. Hold to stop a bake early. When the oven is idle, holding it for 5 seconds turns the oven off.", he: "לחיצה מתחילה. החזקה עוצרת אפייה לפני הזמן. כשהתנור לא עובד, החזקה של 5 שניות מכבה אותו." },
+    { icon: "prover", en: "Proofer: switches the panel to a proofing cabinet, if one is connected. Not for baking.", he: "מתפחה: מעביר את הלוח למתפחה, אם מחוברת. לא לאפייה." }
+  ] }
+];
+const PROGRAMS = Array.from({ length: 12 }, (_, i) => ({ key: "P" + (i + 1), what: TODO("What is saved here?", "מה שמור כאן?") }));
+const USE_PROGRAM = [
+  { en: "Press the program's P button. Its light starts flashing.", he: "ללחוץ על כפתור ה-P של התוכנית. הנורה שלו מתחילה להבהב." },
+  { en: "Press START / STOP.", he: "ללחוץ על START / STOP." },
+  { en: "The oven preheats. Don't put food in yet.", he: "התנור מתחמם. עדיין לא מכניסים אוכל." },
+  { en: "When it beeps and the oven light flashes, put the trays in and close the door. Baking starts by itself.", he: "כשיש צפצוף ואור התנור מהבהב, להכניס את המגשים ולסגור את הדלת. האפייה מתחילה לבד." },
+  { en: "When it beeps and the light flashes again, the pastries are ready.", he: "כשיש שוב צפצוף והאור מהבהב, המאפים מוכנים." }
+];
 
 const BAKING = [
   { name: { en: "Rugelach", he: "רוגלך" }, time: "23",
@@ -612,6 +666,14 @@ function renderBaking() {
       </section>
       <section class="card"><h3>${t(UI.howMany)}</h3><p class="flush">${t(OVEN.howMany)}</p></section>
       <section class="card wide">${bakeTable()}</section>
+      <section class="card wide"><h3>${t(UI.panel)}</h3>
+        <div class="panel">${PANEL.map(g => `<div class="pgroup"><h4>${t(g.group)}</h4><dl>${g.keys.map(k =>
+          `<dt class="${k.warn ? "warn" : ""}">${k.icon ? `<span class="keycap ico">${I[k.icon]}</span>` : `<span class="keycap" dir="ltr">${k.key}</span>`}</dt><dd class="${k.warn ? "warn" : ""}">${t(k)}</dd>`).join("")}</dl></div>`).join("")}</div>
+      </section>
+      <section class="card"><h3>${t(UI.useProgram)}</h3><ol class="checks">${USE_PROGRAM.map(s => `<li>${t(s)}</li>`).join("")}</ol></section>
+      <section class="card"><h3>${t(UI.programs)}</h3>
+        <dl class="progs">${PROGRAMS.map(p => `<dt><span class="keycap" dir="ltr">${p.key}</span></dt><dd>${txt(p.what)}</dd>`).join("")}</dl>
+      </section>
       ${BAKING.map(x => `<section class="card"><div class="pastry-head"><h3>${t(x.name)}</h3><span class="pill"><bdi dir="ltr">${x.time}</bdi> ${t(UI.min)}</span></div>
         <p class="flush"><b>${t(UI.finish)}:</b> ${t(x.finish)}</p>
         <p class="flush"><b>${t(UI.ingredients)}:</b> ${txt(TODO("To be added", "יתווספו בהמשך"))}</p></section>`).join("")}
