@@ -479,7 +479,8 @@ const BAKING = [
     finish: { en: "Sprinkle powdered sugar", he: "לפזר אבקת סוכר" } }
 ];
 
-// Same in Katzenelson 50 and 135. For Weizman later: music outside too.
+const MUSIC = { en: "<b>Music.</b> Turn on the music.", he: "<b>מוזיקה.</b> להדליק מוזיקה." };
+// Same in all three branches. Weizman swaps MUSIC for its own and adds steps (see OPENING_WEIZMAN).
 const SEATING = { title: { en: "Seating area", he: "אזור ישיבה" },
     items: [
       { en: "<b>Outside.</b> Unlock the locks and take out the chains. Roll the chains up neatly, close them with the lock and put them back in their place.", he: "<b>בחוץ.</b> לפתוח את המנעולים ולהוציא את השרשראות. לגלגל אותן מסודר, לסגור עם המנעול ולהניח במקום." },
@@ -491,7 +492,7 @@ const SEATING = { title: { en: "Seating area", he: "אזור ישיבה" },
           { label: { en: "Refill", he: "למלא" }, chips: [{ en: "Lids", he: "מכסים" }, { en: "Napkins", he: "מפיות" }, { en: "Wet wipes", he: "מגבונים" }, { en: "Etc.", he: "וכו׳" }] }
         ] },
       { en: "<b>Umbrellas, heaters and fans.</b> Open the umbrellas. Take out and turn on the heaters or fans (heaters in winter).", he: "<b>שמשיות ומאווררים.</b> לפתוח שמשיות. להוציא ולהדליק תנורים/מאווררים (תנורים בחורף)." },
-      { en: "<b>Music.</b> Turn on the music.", he: "<b>מוזיקה.</b> להדליק מוזיקה." }
+      MUSIC
     ] };
 
 const CASHIER = { title: { en: "Cashier", he: "קופה" },
@@ -550,7 +551,13 @@ const OPENING_WEIZMAN = [
   { ...COFFEE, items: [...COFFEE.items,
     { en: "<b>Orange juice machine.</b> Fill the machine with oranges and turn it on. Make sure there's a jug for the juice.", he: "<b>מכונת תפוזים.</b> למלא תפוזים במכונה ולהדליק אותה. לוודא שיש כד למיץ." },
     { en: "<b>Jerrycans.</b> Check how many jerrycans need to go to the branches and get them ready.", he: "<b>ג׳ריקנים.</b> לבדוק כמה ג׳ריקנים צריך לשלוח לסניפים ולהכין אותם." }
-  ] }
+  ] },
+  { ...SEATING, items: [...SEATING.items.filter(x => x !== MUSIC),
+    { en: "<b>Awnings and ceiling fans.</b> Open the awnings and turn on the ceiling fans.", he: "<b>מרקיזות ומאווררי תקרה.</b> לפתוח מרקיזות ומאווררי תקרה." },
+    { en: "<b>Buzzers.</b> Move the buzzers to the cashier.", he: "<b>זמזמים.</b> להעביר את הזמזמים לקופה." },
+    { en: "<b>Music.</b> Turn on the music, outside too!", he: "<b>מוזיקה.</b> להדליק מוזיקה, גם בחוץ!" }
+  ] },
+  CASHIER
 ];
 
 const OPENING_K50 = [

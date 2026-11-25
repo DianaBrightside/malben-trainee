@@ -17,7 +17,7 @@ All content lives in the data section at the top of the page's `<script>`, above
 - `DRINKS`: drink tutorials. `SHOT` and `STEAM` hold steps shared by several drinks.
 - `HOW_MANY`, `BAKING`: the Baking page's top cards and the bake table (also shown in the Katzenelson 50 opening routine).
 - `OVENS`: one entry per branch oven for the Baking page's "Oven instructions" toggle: settings, a button guide (`PANEL` for Katzenelson 50's Unox, `PANEL_135` for Katzenelson 135's Tecnoeka) and optional how-to steps (`STEPS_135`). Button icons are in `I`.
-- `COFFEE`, `SEATING`, `CASHIER`, `OPENING_K50`, `OPENING_WEIZMAN`: opening-routine phases. `SEATING` is shared by Katzenelson 50 and 135; `COFFEE` by Katzenelson 50 and Weizman (Weizman adds its own steps on top).
+- `COFFEE`, `SEATING`, `CASHIER`, `OPENING_K50`, `OPENING_WEIZMAN`: opening-routine phases. `SEATING` is shared by all three branches, `COFFEE` and `CASHIER` by Katzenelson 50 and Weizman. Weizman builds its versions from the shared ones and adds its own steps (and swaps `MUSIC` for "outside too").
 - `BRANCHES`: one entry per branch. Starts from `BRANCH_TEMPLATE()` and overrides what is known.
 
 Keep the locker code and other access codes out of the page.
