@@ -129,11 +129,18 @@ main { padding-block: 28px 64px; }
 .hours td { padding: 0 0 2px; text-align: end; }
 .checks { margin: 0; padding-inline-start: 1.3em; display: flex; flex-direction: column; gap: 6px; }
 .todo { background: var(--todo-bg); color: var(--todo-ink); padding: 0 6px; border-radius: 4px; font-style: italic; }
-.phases { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; gap: 22px; counter-reset: ph; }
-.phases > li { counter-increment: ph; position: relative; padding-inline-start: 42px; display: flex; flex-direction: column; align-items: stretch; gap: 8px; min-width: 0; }
-.phases > li::before { content: counter(ph); position: absolute; inset-inline-start: 0; top: 0; font-weight: 700; font-size: 15px; color: var(--accent-ink); background: var(--accent); text-align: center; border-radius: 50%; width: 28px; height: 28px; line-height: 28px; font-variant-numeric: tabular-nums; }
-.phases > li > * { min-width: 0; }
-.phases h4 { margin: 2px 0 0; font-size: 17px; color: var(--brand); display: flex; align-items: center; gap: 8px; }
+.phases { list-style: none; margin: 0; padding: 0; counter-reset: ph; }
+.phases > li { counter-increment: ph; border-bottom: 1px solid var(--line); min-width: 0; }
+.phases > li:last-child { border-bottom: 0; }
+.phases summary { display: flex; align-items: center; gap: 12px; padding: 12px 0; cursor: pointer; list-style: none; }
+.phases summary::-webkit-details-marker { display: none; }
+.phases summary::before { content: counter(ph); flex: none; font-weight: 700; font-size: 15px; color: var(--accent-ink); background: var(--accent); text-align: center; border-radius: 50%; width: 28px; height: 28px; line-height: 28px; font-variant-numeric: tabular-nums; }
+.phases summary::after { content: ""; flex: none; width: 8px; height: 8px; margin-inline: 4px; border-right: 2px solid var(--accent); border-bottom: 2px solid var(--accent); transform: translateY(-2px) rotate(45deg); transition: transform .15s; }
+.phases details[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
+.phases h4 { margin: 0; flex: 1; font-size: 17px; color: var(--brand); display: flex; align-items: center; gap: 8px; }
+.phases .count { font-size: 14px; color: var(--muted); white-space: nowrap; }
+.phase-body { padding: 0 0 18px; padding-inline-start: 40px; display: flex; flex-direction: column; align-items: stretch; gap: 8px; min-width: 0; }
+.phase-body > * { min-width: 0; }
 .phases + * { margin-top: 0; }
 .checks li.plain { list-style: none; }
 .pick { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 6px 12px; align-items: center; margin: 8px 0 2px; }
@@ -256,6 +263,7 @@ const UI = {
   min: { en: "min", he: "דק'" },
   seeBaking: { en: "Full baking guide", he: "מדריך אפייה מלא" },
   fifo: { en: "FIFO: first in, first out. Older items are sold first.", he: "FIFO: מה שנכנס ראשון, יוצא ראשון. את הישנים מוכרים קודם." },
+  tasks: { en: "tasks", he: "משימות" },
   older: { en: "older", he: "ישן" },
   newer: { en: "newer", he: "חדש" },
   branchNote: { en: "Drink recipes are the same in every branch. This page covers what changes from branch to branch.",
@@ -818,12 +826,14 @@ function renderBaking() {
 function renderPhases(phases) {
   const rule = (r) => `<div class="rule">${r.en ? `<span>${t(r)}:</span>` : ""}
     <span class="chip"><b>${t(r.a)}</b> = ${t(UI.older)}</span><span class="chip ghost"><b>${t(r.b)}</b> = ${t(UI.newer)}</span></div>`;
-  return `<ol class="phases">${phases.map(ph => `<li>
-    <h4>${t(ph.title)}${ph.fifo ? ` <span class="tag">FIFO</span>` : ""}</h4>
+  return `<ol class="phases">${phases.map(ph => `<li><details>
+    <summary><h4>${t(ph.title)}${ph.fifo ? ` <span class="tag">FIFO</span>` : ""}</h4><span class="count">${ph.items.filter(x => !x.rule).length} ${t(UI.tasks)}</span></summary>
+    <div class="phase-body">
     <ul class="checks">${ph.items.map(x => x.rule ? `<li class="plain">${rule(x)}</li>` : `<li>${txt(x)}${x.groups ? `<dl class="pick">${x.groups.map(g => `<dt>${t(g.label)}</dt><dd>${g.chips.map(c => `<span class="chip ghost">${t(c)}</span>`).join("")}</dd>`).join("")}</dl>` : ""}${x.sub ? `<ul class="sub">${x.sub.map(s => `<li>${txt(s)}</li>`).join("")}</ul>` : ""}</li>`).join("")}</ul>
     ${ph.fifo ? `<p class="small">${t(UI.fifo)}</p>` : ""}
     ${ph.bake ? bakeTable() + `<button class="btn ghost sm" data-view="baking">${t(UI.seeBaking)}</button>` : ""}
-  </li>`).join("")}</ol>`;
+    </div>
+  </details></li>`).join("")}</ol>`;
 }
 
 function renderBranches() {
