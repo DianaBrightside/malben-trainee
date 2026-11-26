@@ -152,6 +152,9 @@ main { padding-block: 28px 64px; }
 .task label { cursor: pointer; }
 .task:has(input:checked) > div { opacity: .5; }
 .tasks .rule { margin-inline-start: 32px; }
+.task-note.with-pad { display: flex; gap: 14px; align-items: center; }
+.task-note.with-pad .pad { flex: none; padding: 10px 12px; }
+@media (max-width: 760px) { .task-note.with-pad { flex-direction: column; align-items: stretch; } }
 .task-note { font-size: 15px; color: var(--muted); background: var(--bg); border-inline-start: 3px solid var(--accent); border-radius: 4px; padding: 8px 12px; }
 .card-head.routine { margin-bottom: 4px; }
 .card-head.routine h3 { margin: 0; }
@@ -303,7 +306,6 @@ const UI = {
   min: { en: "min", he: "דק'" },
   seeBaking: { en: "Full baking guide", he: "מדריך אפייה מלא" },
   cleanHow: { en: "How to run a cleaning cycle", he: "איך מפעילים מחזור ניקוי" },
-  seeCleaning: { en: "Show me the buttons", he: "להראות לי את הכפתורים" },
   dontPress: { en: "Don't press", he: "לא ללחוץ" },
   fifo: { en: "FIFO: first in, first out. Older items are sold first.", he: "FIFO: מה שנכנס ראשון, יוצא ראשון. את הישנים מוכרים קודם." },
   clearTicks: { en: "Clear ticks", he: "ניקוי סימונים" },
@@ -748,7 +750,7 @@ const CLOSING = [
     ] },
   { title: { en: "Coffee machine", he: "מכונת קפה" },
     items: [
-      { note: true, link: true, en: "<b>Cleaning cycle</b> = press <b>spiral + one cup</b> together. The display shows <b>CLn</b>, the group pulses about 10 times and stops by itself (any button stops it early). <b>Spiral + two cups turns the machine OFF</b>, and holding the spiral alone for 5 seconds opens the settings menu (<b>PrG</b>): if that happens, press two cups until <b>End</b>, then spiral.", he: "<b>מחזור ניקוי</b> = ללחוץ ביחד על <b>ספירלה + כוס אחת</b>. בתצוגה מופיע <b>CLn</b>, הקבוצה עושה כ-10 פולסים ונעצרת לבד (כל כפתור עוצר מוקדם). <b>ספירלה + שתי כוסות מכבה את המכונה</b>, והחזקה של ספירלה לבד 5 שניות פותחת תפריט הגדרות (<b>PrG</b>): אם זה קרה, ללחוץ על שתי כוסות עד <b>End</b>, ואז ספירלה." },
+      { note: true, pad: true, en: "<b>Cleaning cycle</b> = press <b>spiral + one cup</b> together. The display shows <b>CLn</b>, the group pulses about 10 times and stops by itself (any button stops it early). <b>Spiral + two cups turns the machine OFF</b>, and holding the spiral alone for 5 seconds opens the settings menu (<b>PrG</b>): if that happens, press two cups until <b>End</b>, then spiral.", he: "<b>מחזור ניקוי</b> = ללחוץ ביחד על <b>ספירלה + כוס אחת</b>. בתצוגה מופיע <b>CLn</b>, הקבוצה עושה כ-10 פולסים ונעצרת לבד (כל כפתור עוצר מוקדם). <b>ספירלה + שתי כוסות מכבה את המכונה</b>, והחזקה של ספירלה לבד 5 שניות פותחת תפריט הגדרות (<b>PrG</b>): אם זה קרה, ללחוץ על שתי כוסות עד <b>End</b>, ואז ספירלה." },
       { note: true, en: "<b>Never take the portafilter out during the cycle</b>: hot water with detergent sprays out. One group at a time, and not while another group is making coffee: the foam can overflow the drain.", he: "<b>לא להוציא את הראש בזמן המחזור</b>: יוצאים מים חמים עם חומר ניקוי. קבוצה אחת בכל פעם, ולא בזמן שקבוצה אחרת מכינה קפה: הקצף יכול להציף את הניקוז." },
       { en: "<b>Portafilters:</b> you can start about half an hour before closing, from the group furthest right. For each group:", he: "<b>סגירת ראשים:</b> אפשר להתחיל כחצי שעה לפני סגירה, מהראש הימני ביותר. לכל ראש:",
         sub: [
@@ -1060,7 +1062,7 @@ function renderPhases(phases, id) {
   return `<ol class="phases">${phases.map((ph, p) => `<li><details>
     <summary><h4>${t(ph.title)}${ph.fifo ? ` <span class="tag">FIFO</span>` : ""}</h4><span class="count"></span></summary>
     <div class="phase-body">
-    <ul class="tasks">${ph.items.map((x, i) => x.rule ? `<li>${rule(x)}</li>` : x.note ? `<li class="task-note">${txt(x)}${x.link ? ` <button class="btn ghost sm" data-view="drinks" data-drink="machine">${t(UI.seeCleaning)}</button>` : ""}</li>` : task(x, `${id}.${p}.${i}`)).join("")}</ul>
+    <ul class="tasks">${ph.items.map((x, i) => x.rule ? `<li>${rule(x)}</li>` : x.note ? `<li class="task-note ${x.pad ? "with-pad" : ""}">${x.pad ? pad(CLEAN_STEPS[1]) : ""}<div>${txt(x)}</div></li>` : task(x, `${id}.${p}.${i}`)).join("")}</ul>
     ${ph.fifo ? `<p class="small">${t(UI.fifo)}</p>` : ""}
     ${ph.bake ? bakeTable() + `<button class="btn ghost sm" data-view="baking">${t(UI.seeBaking)}</button>` : ""}
     </div>
