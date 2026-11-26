@@ -20,6 +20,8 @@ All content lives in the data section at the top of the page's `<script>`, above
 - `COFFEE`, `SEATING`, `CASHIER`, `OPENING_K50`, `OPENING_K135`, `OPENING_WEIZMAN`: opening routines. `COFFEE`, `SEATING` and `CASHIER` are shared by all three branches. `OPENING_K135` is `OPENING_K50` with its own oven step. Weizman builds its versions from the shared ones and adds its own steps (and swaps `MUSIC` for "outside too").
 - `CLOSING`: closing routine, shared by all three branches. Each branch gets it through `forBranch(CLOSING, "k50" | "k135" | "weizman")`: an item with `only: "<branch>"` shows only in that branch, and `add: { <branch>: {en, he} }` adds a point under an item for that branch.
 - Routine items are written short: a bold label ending in a colon, then what to do (`<b>תנור:</b> ...`). Longer tasks split into `sub:` points; lists of things go in `groups:` chips.
+- `note: true` items are tips or warnings shown in a box without a checkbox.
+- Coffee machine steps follow the La Marzocco Linea Classic S (AV) manual: one cup / two cups / spiral buttons; cleaning cycle = spiral + one cup (display CLn); spiral + two cups = OFF. In the routines "ראש" means the portafilter (English: portafilter).
 - Each routine item gets a checkbox (`renderPhases`). Ticks are kept in localStorage under `malben.ticks`, keyed by branch, routine, section and item position, and clear on a new day. Reordering items moves existing ticks, which is harmless since they reset daily.
 - `BRANCHES`: one entry per branch. Starts from `BRANCH_TEMPLATE()` and overrides what is known.
 

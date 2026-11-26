@@ -152,6 +152,7 @@ main { padding-block: 28px 64px; }
 .task label { cursor: pointer; }
 .task:has(input:checked) > div { opacity: .5; }
 .tasks .rule { margin-inline-start: 32px; }
+.task-note { font-size: 15px; color: var(--muted); background: var(--bg); border-inline-start: 3px solid var(--accent); border-radius: 4px; padding: 8px 12px; }
 .card-head.routine { margin-bottom: 4px; }
 .card-head.routine h3 { margin: 0; }
 .phase-body { padding: 0 0 18px; padding-inline-start: 40px; display: flex; flex-direction: column; align-items: stretch; gap: 8px; min-width: 0; }
@@ -557,7 +558,9 @@ const CASHIER = { title: { en: "Cashier", he: "קופה" },
 // Same in all three branches.
 const COFFEE = { title: { en: "Coffee station", he: "עמדת קפה" },
     items: [
-      { en: "<b>Group heads:</b> two double shots from each head.", he: "<b>ראשים:</b> שתי מנות כפולות מכל ראש." },
+      { note: true, en: "<b>Machine buttons</b> (La Marzocco Linea Classic S): one cup = single espresso, two cups = double, spiral = continuous (press again to stop). The machine is ready when all the button lights are on.", he: "<b>מקשי המכונה</b> (La Marzocco Linea Classic S): כוס אחת = אספרסו יחיד, שתי כוסות = כפול, ספירלה = רציף (לוחצים שוב כדי לעצור). המכונה מוכנה כשכל נורות הכפתורים דולקות." },
+      { note: true, en: "Display shows <b>OFF</b>? Press the two-cups button on the left group and wait for all the button lights to come on.", he: "בתצוגה כתוב <b>OFF</b>? ללחוץ על שתי כוסות בקבוצה השמאלית ולחכות שכל נורות הכפתורים יידלקו." },
+      { en: "<b>Portafilters:</b> two double shots (two-cups button) from each group.", he: "<b>ראשים:</b> שתי מנות כפולות (כפתור שתי כוסות) מכל ראש." },
       { en: "<b>Steam wands:</b> open each one for a few seconds to release the pressure, then wipe with a clean cloth.", he: "<b>סטימרים:</b> לפתוח כל סטימר לכמה שניות לשחרור לחץ, ולנגב בסמרטוט נקי." },
       { en: "<b>Take out of the fridges:</b>", he: "<b>להוציא מהמקררים:</b>",
         groups: [
@@ -675,14 +678,16 @@ const CLOSING = [
     ] },
   { title: { en: "Coffee machine", he: "מכונת קפה" },
     items: [
-      { en: "<b>Group heads:</b> you can start about half an hour before closing, from the head furthest right. For each head:", he: "<b>סגירת ראשים:</b> אפשר להתחיל כחצי שעה לפני סגירה, מהראש הימני ביותר. לכל ראש:",
+      { note: true, en: "<b>Cleaning cycle</b> = press <b>spiral + one cup</b> together. The display shows <b>CLn</b>, the group pulses about 10 times and stops by itself (any button stops it early). <b>Spiral + two cups turns the machine OFF</b>, and holding the spiral alone for 5 seconds opens the settings menu (<b>PrG</b>): if that happens, press two cups until <b>End</b>, then spiral.", he: "<b>מחזור ניקוי</b> = ללחוץ ביחד על <b>ספירלה + כוס אחת</b>. בתצוגה מופיע <b>CLn</b>, הקבוצה עושה כ-10 פולסים ונעצרת לבד (כל כפתור עוצר מוקדם). <b>ספירלה + שתי כוסות מכבה את המכונה</b>, והחזקה של ספירלה לבד 5 שניות פותחת תפריט הגדרות (<b>PrG</b>): אם זה קרה, ללחוץ על שתי כוסות עד <b>End</b>, ואז ספירלה." },
+      { note: true, en: "<b>Never take the portafilter out during the cycle</b>: hot water with detergent sprays out. One group at a time, and not while another group is making coffee: the foam can overflow the drain.", he: "<b>לא להוציא את הראש בזמן המחזור</b>: יוצאים מים חמים עם חומר ניקוי. קבוצה אחת בכל פעם, ולא בזמן שקבוצה אחרת מכינה קפה: הקצף יכול להציף את הניקוז." },
+      { en: "<b>Portafilters:</b> you can start about half an hour before closing, from the group furthest right. For each group:", he: "<b>סגירת ראשים:</b> אפשר להתחיל כחצי שעה לפני סגירה, מהראש הימני ביותר. לכל ראש:",
         sub: [
-          { en: "Switch to the blind head. Shake the head in the rail and brush it, under running water.", he: "להחליף לראש אפס. לשקשק את הראש במסילה ולהבריש, עם מים זורמים." },
-          { en: "Half a teaspoon of powder → cleaning cycle (long press on the spiral button, and meanwhile a short press on double espresso).", he: "חצי כפית אבקה ← מחזור ניקוי (לחיצה ארוכה על כפתור ספירלה ותוך כדי לחיצה קצרה על אספרסו כפול)." },
-          { en: "When it ends: brush the head and rail, shake the head with the powder, then run clean water. Wipe the rail with a cloth until no dirt is left.", he: "כשנגמר: לשפשף ראש ומסילה במברשת, לשקשק את הראש עם החומר ולהוריד מים נקיים. לנגב את המסילה בסמרטוט עד שאין לכלוך." },
-          { en: "Run another cleaning cycle without powder.", he: "להריץ עוד מחזור ניקוי בלי חומר." }
+          { en: "Switch to the blind portafilter (ראש אפס). Wiggle it in the group and brush, under running water.", he: "להחליף לראש אפס (ידית עם סל עיוור). לשקשק את הראש במסילה ולהבריש, עם מים זורמים." },
+          { en: "Half a teaspoon of powder in the blind portafilter → cleaning cycle (spiral + one cup).", he: "חצי כפית אבקה בראש האפס ← מחזור ניקוי (ספירלה + כוס אחת)." },
+          { en: "When it ends: brush the portafilter and group, wiggle the portafilter with the powder, then run clean water. Wipe the group with a cloth until no dirt is left.", he: "כשנגמר: לשפשף ראש ומסילה במברשת, לשקשק את הראש עם החומר ולהוריד מים נקיים. לנגב את המסילה בסמרטוט עד שאין לכלוך." },
+          { en: "Run another cleaning cycle without powder (spiral + one cup).", he: "להריץ עוד מחזור ניקוי בלי חומר (ספירלה + כוס אחת)." }
         ] },
-      { en: "<b>At closing:</b> close the remaining heads the same way.", he: "<b>כשסוגרים:</b> לסגור את שאר הראשים באותה דרך." },
+      { en: "<b>At closing:</b> clean the remaining portafilters and groups the same way.", he: "<b>כשסוגרים:</b> לסגור את שאר הראשים באותה דרך." },
       { en: "<b>Grinder:</b>", he: "<b>מטחנה:</b>",
         sub: [
           { en: "Close the slide. Empty the hopper into an empty coffee bag and seal it with stickers.", he: "לסגור את הלשון. לרוקן את הכד לשקית קפה ריקה ולסגור במדבקות." },
@@ -694,17 +699,22 @@ const CLOSING = [
       { en: "<b>To washing:</b>", he: "<b>לשטיפה:</b>",
         groups: [ { label: { en: "Send", he: "לשלוח" }, chips: [{ en: "Milk pitchers", he: "כדי חלב" }, { en: "Rubber mats", he: "שטיחי גומי" }, { en: "Ice scoops", he: "כפות קרח" }, { en: "Coffee bin", he: "פח קפה" }, { en: "Foam cup and spoon", he: "כוס וכף קצף" }, { en: "פס בונים", he: "פס בונים" }] } ],
         sub: [
-          { en: "Group heads: take apart and wash by hand with a scrubber and soap.", he: "ראשים: לפרק ולשטוף ידנית עם סקוץ וסבון." },
-          { en: "Drip rail: carefully, so it doesn't spill.", he: "מסילת ניקוז: בזהירות שלא ישפך." }
+          { en: "Portafilters: take apart and wash by hand with a scrubber and soap. Don't soak the black handle in hot water.", he: "ראשים: לפרק ולשטוף ידנית עם סקוץ וסבון. לא להשרות את הידית השחורה במים חמים." },
+          { en: "Drip rail: carefully, so it doesn't spill. Also clean the drip tray underneath.", he: "מסילת ניקוז: בזהירות שלא ישפך. לנקות גם את מגש הניקוז שמתחת." }
         ] },
       { en: "<b>Steam wands:</b>", he: "<b>סטימרים:</b>",
         sub: [
           { en: "A cup of water with a capful of the blue steam wand cleaner.", he: "כוס מים עם פקק חומר כחול של סטימרים." },
           { en: "Put the wand in the cup and open and close it in pulses, 10 times.", he: "להכניס את הסטימר לכוס ולפתוח ולסגור בפולסים 10 פעמים." },
           { en: "Leave it to soak for about 10 minutes.", he: "להשרות כ-10 דקות." },
-          { en: "Wipe off the dried milk with a clean cloth, also under the rubber grip. Clean the bottom tip well.", he: "לנגב בסמרטוט נקי משאריות חלב יבש, גם מתחת לגומי האחיזה. לנקות היטב את הקצה התחתון." }
+          { en: "Wipe off the dried milk with a clean cloth, also under the rubber grip. Clean the bottom tip well.", he: "לנגב בסמרטוט נקי משאריות חלב יבש, גם מתחת לגומי האחיזה. לנקות היטב את הקצה התחתון." },
+          { en: "Finally, open each wand for a few seconds to blow out the cleaner. Careful, hot steam!", he: "בסוף, לפתוח כל סטימר לכמה שניות כדי להוציא את החומר. זהירות, אדים חמים!" }
         ] },
-      { en: "<b>Deep clean:</b> scrubber and soap under and around the machine and on it: front, behind the heads, sides, top (where there are no cups), steam wand handle. Squeegee, then dry paper. Marks on the stainless steel: blue spray and paper until it shines.", he: "<b>ניקוי יסודי:</b> סקוץ׳ וסבון מתחת ומסביב למכונה ועליה: קדמה, מאחורי הראשים, צדדים, למעלה (איפה שאין כוסות), ידית הסטימר. מגב ואז נייר יבש. סימנים על הנירוסטה: ספריי כחול ונייר עד שמבריק.",
+      { en: "<b>Deep clean:</b> scrubber and soap on the counter under and around the machine, then squeegee and dry paper. The machine itself (front, behind the portafilters, sides, top where there are no cups, steam wand handle): a soft cloth along the grain of the stainless steel. Marks: blue spray and paper until it shines.", he: "<b>ניקוי יסודי:</b> סקוץ׳ וסבון על המשטח מתחת ומסביב למכונה, ואז מגב ונייר יבש. המכונה עצמה (קדמה, מאחורי הראשים, צדדים, למעלה איפה שאין כוסות, ידית הסטימר): מטלית רכה בכיוון הקווים של הנירוסטה. סימנים: ספריי כחול ונייר עד שמבריק.",
+        sub: [
+          { en: "No scrubber on the machine body, no alcohol or solvents on painted or printed parts, and never spray water on the machine.", he: "בלי סקוץ׳ על גוף המכונה, בלי אלכוהול או ממיסים על חלקים צבועים או מודפסים, ואף פעם לא להתיז מים על המכונה." },
+          { en: "The button panel isn't waterproof: only a dry or lightly damp cloth.", he: "לוח הכפתורים לא אטום למים: רק מטלית יבשה או לחה מעט." }
+        ],
         add: { weizman: { en: "Go out from behind the bar and clean the counter and the back of the machine from outside.", he: "לצאת מהבר ולנקות את השיש והגב של מכונת הקפה מבחוץ." } } },
       { en: "<b>Cupboards:</b> scrubber and soap on the cupboards around the coffee machine and on the ice machine. Wipe with paper until clean. Clean the milk drawers.", he: "<b>ארונות:</b> סקוץ וסבון על הארונות סביב מכונת הקפה ועל מכונת הקרח. לנגב בנייר עד שנקי. לנקות את מגירות החלב.",
         add: { weizman: { en: "Scrub the top of the ice machine, under the counter.", he: "לנקות עם סקוץ את הגג של מכונת הקרח, מתחת לשיש." },
@@ -713,7 +723,7 @@ const CLOSING = [
       { en: "<b>Coffee cups:</b> refill.", he: "<b>כוסות קפה:</b> למלא." },
       { only: "weizman", en: "<b>Cashier area:</b> spray the glass, lift and clean underneath if needed, wet wipe on the receipt printer.", he: "<b>אזור קופה:</b> שפריצר על הזכוכית, להרים ולנקות מתחת אם צריך, מגבון על מדפסת הבונים." },
       { en: "<b>Blender:</b> jug not clean? Wash it with a scrubber and soap. Wet wipe on the body and where the jug sits.", he: "<b>בלנדר:</b> הכד לא נקי? לשטוף עם סקוץ וסבון. מגבון על גוף הבלנדר ואיפה שהכד יושב." },
-      { en: "<b>Put away:</b> everything back from washing (mats, pitchers, cup and spoon, rail etc.). Clean, taken-apart heads on the rail.", he: "<b>סידור:</b> להחזיר הכל מהשטיפה (שטיחים, כדים, כוס וכף, מסילה וכו׳). ראשים נקיים ומפורקים על המסילה." },
+      { en: "<b>Put away:</b> everything back from washing (mats, pitchers, cup and spoon, rail etc.). Clean, taken-apart portafilters on the rail.", he: "<b>סידור:</b> להחזיר הכל מהשטיפה (שטיחים, כדים, כוס וכף, מסילה וכו׳). ראשים נקיים ומפורקים על המסילה." },
       { en: "<b>Sink:</b> scrubber and soap in and around the sink and on the tap. Wipe until it shines and clear out any leftovers. Still not shining? Scrubber and degreaser.", he: "<b>כיור:</b> סקוץ וסבון בכיור, מסביב ועל הברז. לנגב שיבריק ולפנות שאריות. עדיין לא מבריק? סקוץ ומסיר שומנים." },
       { en: "<b>Final check:</b> everything clean and back in its place.", he: "<b>סגירת פינות:</b> לעבור ולוודא שהכל נקי ובמקום." }
     ] },
@@ -954,7 +964,7 @@ function renderPhases(phases, id) {
   return `<ol class="phases">${phases.map((ph, p) => `<li><details>
     <summary><h4>${t(ph.title)}${ph.fifo ? ` <span class="tag">FIFO</span>` : ""}</h4><span class="count"></span></summary>
     <div class="phase-body">
-    <ul class="tasks">${ph.items.map((x, i) => x.rule ? `<li>${rule(x)}</li>` : task(x, `${id}.${p}.${i}`)).join("")}</ul>
+    <ul class="tasks">${ph.items.map((x, i) => x.rule ? `<li>${rule(x)}</li>` : x.note ? `<li class="task-note">${txt(x)}</li>` : task(x, `${id}.${p}.${i}`)).join("")}</ul>
     ${ph.fifo ? `<p class="small">${t(UI.fifo)}</p>` : ""}
     ${ph.bake ? bakeTable() + `<button class="btn ghost sm" data-view="baking">${t(UI.seeBaking)}</button>` : ""}
     </div>
