@@ -237,7 +237,6 @@ const UI = {
   address: { en: "Address", he: "כתובת" },
   hours: { en: "Hours", he: "שעות" },
   manager: { en: "Manager", he: "מנהל/ת" },
-  equipment: { en: "Equipment", he: "ציוד" },
   opening: { en: "Opening the shift", he: "פתיחת משמרת" },
   closing: { en: "Closing the shift", he: "סגירת משמרת" },
   special: { en: "What's different here", he: "מה מיוחד בסניף" },
@@ -617,11 +616,6 @@ const BRANCH_TEMPLATE = () => ({
   address: TODO("Add address", "להוסיף כתובת"),
   hours: TODO("Add opening hours", "להוסיף שעות פתיחה"),
   manager: TODO("Add name and phone", "להוסיף שם וטלפון"),
-  equipment: [
-    TODO("Espresso machine model", "דגם מכונת האספרסו"),
-    TODO("Grinder model and setting", "דגם המטחנה וכיוון הטחינה"),
-    TODO("Where milk, cups and syrups are kept", "איפה נמצאים החלב, הכוסות והסירופים")
-  ],
   opening: [
     { en: "Turn on the espresso machine at least 30 minutes before opening.", he: "להדליק את מכונת האספרסו לפחות 30 דקות לפני הפתיחה." },
     { en: "Pull a test shot and check the timing (25–30 s).", he: "למצות אספרסו לבדיקה ולבדוק את הזמן (25–30 שנ')." },
@@ -800,10 +794,9 @@ function renderBranches() {
           <dt>${t(UI.manager)}</dt><dd>${txt(b.manager)}</dd>
         </dl>
       </section>
-      <section class="card"><h3>${t(UI.equipment)}</h3>${ul(b.equipment)}</section>
-      <section class="card wide"><h3>${t(UI.opening)}</h3>${b.opening[0] && b.opening[0].items ? renderOpening(b.opening) : ul(b.opening, "ol")}</section>
-      <section class="card"><h3>${t(UI.closing)}</h3>${ul(b.closing, "ol")}</section>
       <section class="card"><h3>${t(UI.special)}</h3>${ul(b.special)}</section>
+      <section class="card wide"><h3>${t(UI.opening)}</h3>${b.opening[0] && b.opening[0].items ? renderOpening(b.opening) : ul(b.opening, "ol")}</section>
+      <section class="card wide"><h3>${t(UI.closing)}</h3>${ul(b.closing, "ol")}</section>
     </div>`;
 }
 
