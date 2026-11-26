@@ -612,6 +612,53 @@ const OPENING_K135 = OPENING_K50.map(ph => !ph.bake ? ph : { ...ph, items: [
   { en: "Turn on the oven: left knob to ∞, right knob to about 170°C. Wait about 5 minutes, until the orange light goes off.", he: "להדליק את התנור: כפתור שמאלי ל-∞, כפתור ימני לכ-170°C. לחכות כ-5 דקות, עד שהנורה הכתומה נכבית." },
   ...ph.items.slice(1)
 ] });
+const MARQUEES = { en: "<b>Awnings:</b> fold the awnings and turn off the ceiling fans", he: "<b>מרקיזות:</b> קיפול המרקיזות וכיבוי מאווררי תקרה" };
+// Same in all three branches. Weizman adds MARQUEES (see CLOSING_WEIZMAN).
+const CLOSING = [
+  { title: { en: "Before closing", he: "לפני הסגירה" },
+    items: [
+      { en: "<b>Waste report:</b> every product that isn't kept for tomorrow goes into the waste report, and gets a 50% discount sign.", he: "<b>יצירת דוח פחת:</b> כל המוצרים שלא נשמרים למחר להכניס לדוח פחת, ולשים עליהם שלטון 50% הנחה." }
+    ] },
+  { title: { en: "Take apart and clean the vitrina", he: "פירוק וניקוי הוויטרינה" },
+    items: [
+      { en: "Share the waste between the staff", he: "חלוקת פחת בין העובדים" },
+      { en: "Turn off the toaster and send to washing: the salamander racks, tongs, spatula, פס בונים, cutting board, etc.", he: "כיבוי טוסטר ושליחה לשטיפה של רשתות סלמנדרה, מלקחיים, שפכטל, פס בונים, קרש חיתוך וכו'." },
+      { en: "<b>Mark the paninis:</b> bring two trays from the washing area and put baking paper on them. Take all the paninis out of the vitrina, mark them with a marker on the bottom side and lay them neatly on one tray.", he: "<b>סימון פניני:</b> להביא שתי פיילות מהשטיפה, לשים עליהן נייר אפיה. להוציא את כל הפניני מהויטרינה ולסמן בטוש על הצד התחתון ולהניח במסודר בפיילה אחת." },
+      { en: "<b>Take out the pastries:</b> on the second tray, lay out neatly all the sweet pastries that are kept, except the מלבנים! The מלבנים go back into the מלבנים box. Cover the trays and put them in the fridge under the vitrina.", he: "<b>הוצאת מאפים:</b> בפיילה השניה להניח מסודר את כל המאפים המתוקים שנשמרים חוץ ממלבנים! מלבנים להחזיר לקופסת המלבנים. לסגור פיילות ולהכניס למקרר מתחת לויטרינה." },
+      { en: "<b>Fold the signs:</b> fold all the signs and put them aside neatly", he: "<b>קיפול שלטונים:</b> לקפל את כל השלטונים הצידה באופן מסודר" },
+      { en: "<b>Send the trays to washing:</b> and take out the vitrina doors and the wooden boards.", he: "<b>שליחת מגשים לשטיפה:</b> ולהוציא את הדלתות של הויטרינות והקרשי עץ." },
+      { en: "<b>Spray and paper on every surface:</b> spray blue cleaner on every surface (top, sides, inside and outside) and wipe thoroughly with paper so no marks are left. Also wipe the door rails, and between the rails and the glass.", he: "<b>שפריצר ונייר על כל המשטחים:</b> ריסוס חומר כחול על כל המשטחים (מלמעלה, מהצדדים, מבפנים ומבחוץ) וניגוב יסודי עם נייר ללא השארת סימנים. לשים לנגב גם את המסילות של הדלתות, ובין המסילות לזכוכית." },
+      { en: "<b>Put the clean trays back:</b> dry them completely with paper and put them back in their exact place in the vitrina.", he: "<b>החזרת המגשים הנקיים:</b> ייבוש מוחלט שלהם עם נייר והחזרתם למקום המדויק בוויטרינה." },
+      { en: "<b>Paper and signs:</b> put paper on the trays that need it and set the signs in their places", he: "<b>נייר ושלטונים:</b> לשים נייר על המגשים הרלוונטים וסידור שלטונים במקומם" },
+      { en: "Cut brown paper for the pastry trays", he: "לגזור נייר חום למגשי המאפים" }
+    ] },
+  { title: { en: "Clean the toaster station", he: "ניקוי עמדת טוסטר" },
+    items: [
+      { en: "Put the olives in the fridge.", he: "להכניס זיתים למקרר." },
+      { en: "<b>Salamander:</b> scrubber and soap on the inside of the salamander, and spray on the outside so it shines!", he: "<b>סלמנדרה:</b> סקוץ סבון על הבפנים של הסלמנדרה ושפריצר על החוץ שיבריק!" },
+      { en: "<b>Toaster:</b> scrubber with soap and almost no water! Inside the toaster and on the sides. Spray and paper on the outside.", he: "<b>טוסטר:</b> סקוץ עם סבון וכמעט בלי מים! בתוך הטוסטר, בצדדים. שפריצר ונייר על החלק החיצוני." },
+      { en: "<b>Clean the work surface:</b> scrubber and soap on the whole work surface. Move the salamander and toaster and clean behind them. Wipe everything with dry paper and put everything back in its place.", he: "<b>ניקוי משטח עבודה:</b> סקוץ סבון על כל משטח העבודה, להזיז סלמנדרה וטוסטר ולנקות מאחורה. לנגב הכל עם נייר יבש ולהחזיר הכל למקום." },
+      { en: "<b>Clean the fridges:</b> go over all the fridges and doors with blue spray. If needed, also go over them with stainless steel spray.", he: "<b>ניקוי מקררים:</b> מעבר עם שפריצר כחול על כל המקררים והדלתות נירוסטה, אם יש צורך גם לעבור עם ספריי נירוסטה." }
+    ] },
+  { title: { en: "Sort and organise", he: "סידור וארגון" },
+    items: [
+      { en: "Put all the clean tools back from the washing area: and check there are: tongs, cutting board, knives, spoons", he: "להחזיר את כל הכלים הנקיים מהשטיפה: ולוודא שיש: מלקחיים, קרש חיתוך, סכינים, כפות" },
+      { en: "<b>Check the station stock:</b> napkins, panini bags, small trays, large trays with paper, granola and coconut.", he: "<b>לוודא מלאי עמדה:</b> מפיות, שקיות פניני, מגשים קטנים, מגשים גדולים עם נייר, גרנולה וקוקוס." }
+    ] },
+  { title: { en: "Outside", he: "חוץ" },
+    items: [
+      { en: "<b>Sugar station:</b> take the big container out from the bin's hiding place and move everything into it (lids, sugars, napkins, all of it), and put it inside. Make sure the sugar station is full, clean and ready for tomorrow. Clean the station with spray and paper, including the bin shaft. Bring in the water cups and wet wipes. Take out the chains and lock the station.", he: "<b>עמדת סוכרים:</b> להוציא ממחבוא הפח את הכלי הגדול ולהעביר אליו את כל הכלים (מכסים סוכרים מפיות הכל), ולהניח בפנים. לוודא שעמדת סוכרים מלאה, נקייה ומוכנה למחר. לנקות את העמדה עם שפריצר ונייר, כולל הפיר של הפח. להכניס כוסות מים ומגבונים. להוציא שרשראות ולנעול את העמדה." },
+      { en: "<b>Clean the tables:</b> clear all the tables and wipe them with a wet wipe.", he: "<b>ניקוי שולחנות:</b> פינוי כל השולחנות וניגוב עם מגבון." },
+      { en: "<b>Fold the seating:</b> fold the tables and chairs and put them neatly in their place", he: "<b>קיפול ישיבה:</b> קיפול שולחנות וכיסאות והנחתם באופן מסודר במקום" },
+      { en: "Tie the tables and chairs together with the chains and lock them.", he: "לקשור את השולחנות והכיסאות עם השרשראות ולנעול." },
+      { en: "<b>Bring in the heaters/fans:</b> unplug them and bring them inside", he: "<b>הכנסת תנורים/מאווררים:</b> ניתוק מהחשמל והכנסה פנימה" },
+      { en: "<b>Turn off the music:</b> and put the phone on charge", he: "<b>כיבוי מוזיקה:</b> ולשים טלפון בטעינה" },
+      { en: "Make sure the iPad is charging", he: "לוודא שהאייפד בטעינה" }
+    ] }
+];
+const CLOSING_WEIZMAN = CLOSING.map((ph, i) => i !== CLOSING.length - 1 ? ph : { ...ph, items: [
+  ...ph.items.slice(0, -2), MARQUEES, ...ph.items.slice(-2)
+] });
 const BRANCH_TEMPLATE = () => ({
   address: TODO("Add address", "להוסיף כתובת"),
   hours: TODO("Add opening hours", "להוסיף שעות פתיחה"),
@@ -623,12 +670,6 @@ const BRANCH_TEMPLATE = () => ({
     { en: "Count the cash drawer.", he: "לספור את הקופה." },
     TODO("Add steps that are specific to this branch", "להוסיף שלבים שמיוחדים לסניף")
   ],
-  closing: [
-    { en: "Backflush the group heads and soak the portafilters.", he: "לבצע שטיפה הפוכה לראשי המכונה ולהשרות את הידיות." },
-    { en: "Clean the steam wands and empty the drip tray.", he: "לנקות את המקציפים ולרוקן את מגש הניקוז." },
-    { en: "Put milk back in the fridge and write down what needs ordering.", he: "להחזיר חלב למקרר ולרשום מה צריך להזמין." },
-    TODO("Add steps that are specific to this branch", "להוסיף שלבים שמיוחדים לסניף")
-  ],
   special: [
     TODO("For example: seating area, delivery times, alarm code location", "לדוגמה: אזור ישיבה, שעות משלוחים, איפה קוד האזעקה")
   ]
@@ -637,6 +678,7 @@ const BRANCH_TEMPLATE = () => ({
 const BRANCHES = [
   { name: { en: "Katzenelson 50", he: "כצנלסון 50" }, ...BRANCH_TEMPLATE(),
     opening: OPENING_K50,
+    closing: CLOSING,
     special: [
       { en: "<b>Fridays and Saturdays:</b> we don't use glass cups, we only take out takeaway cups", he: "<b>שישי ושבת:</b> לא משתמשים בכוסות זכוכית, מוציאים רק כוסות טייק אווי" },
       { en: "<b>Warehouse (פיצוחי):</b> Every day we go to the warehouse at Katzenelson 53, across the street. Bring the things back on the cart, which is kept in the warehouse.", he: "<b>מחסן (פיצוחי):</b> כל יום הולכים למחסן בכצנלסון 53, מעבר לכביש. מביאים משם את הדברים עם העגלה, שנמצאת במחסן." }
@@ -649,6 +691,7 @@ const BRANCHES = [
     ] },
   { name: { en: "Katzenelson 135", he: "כצנלסון 135" }, ...BRANCH_TEMPLATE(),
     opening: OPENING_K135,
+    closing: CLOSING,
     address: { en: "Katzenelson 135, Givatayim", he: "כצנלסון 135, גבעתיים" },
     hours: [
       { day: { en: "Sun–Thu", he: "א׳–ה׳" }, time: "07:30–19:00" },
@@ -657,6 +700,7 @@ const BRANCHES = [
     ] },
   { name: { en: "Weizman 51", he: "ויצמן 51" }, ...BRANCH_TEMPLATE(),
     opening: OPENING_WEIZMAN,
+    closing: CLOSING_WEIZMAN,
     address: { en: "Weizman 51, Givatayim", he: "ויצמן 51, גבעתיים" },
     hours: [
       { day: { en: "Sun–Thu", he: "א׳–ה׳" }, time: "07:30–18:00" },
@@ -771,7 +815,7 @@ function renderBaking() {
     </div>`;
 }
 
-function renderOpening(phases) {
+function renderPhases(phases) {
   const rule = (r) => `<div class="rule">${r.en ? `<span>${t(r)}:</span>` : ""}
     <span class="chip"><b>${t(r.a)}</b> = ${t(UI.older)}</span><span class="chip ghost"><b>${t(r.b)}</b> = ${t(UI.newer)}</span></div>`;
   return `<ol class="phases">${phases.map(ph => `<li>
@@ -787,6 +831,7 @@ function renderBranches() {
   const pick = BRANCHES.map((x, i) =>
     `<button class="btn ${i === S.branch ? "" : "ghost"}" data-branch="${i}" aria-pressed="${i === S.branch}">${t(x.name)}</button>`).join("");
   const ul = (arr, tag = "ul") => `<${tag} class="checks">${arr.map(x => `<li>${txt(x)}</li>`).join("")}</${tag}>`;
+  const routine = (arr) => arr[0] && arr[0].items ? renderPhases(arr) : ul(arr, "ol");
   app.innerHTML = `
     <p class="note">${t(UI.branchNote)}</p>
     <div class="branch-pick">${pick}</div>
@@ -799,8 +844,8 @@ function renderBranches() {
         </dl>
       </section>
       <section class="card"><h3>${t(UI.special)}</h3>${ul(b.special)}</section>
-      <section class="card wide"><h3>${t(UI.opening)}</h3>${b.opening[0] && b.opening[0].items ? renderOpening(b.opening) : ul(b.opening, "ol")}</section>
-      <section class="card wide"><h3>${t(UI.closing)}</h3>${ul(b.closing, "ol")}</section>
+      <section class="card wide"><h3>${t(UI.opening)}</h3>${routine(b.opening)}</section>
+      <section class="card wide"><h3>${t(UI.closing)}</h3>${routine(b.closing)}</section>
     </div>`;
 }
 
