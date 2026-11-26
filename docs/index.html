@@ -194,6 +194,10 @@ code { font-family: ui-monospace, "SF Mono", Menlo, monospace; background: var(-
 .keycap { display: inline-flex; align-items: center; justify-content: center; min-width: 40px; height: 30px; padding: 0 9px; border-radius: 6px; background: #1b1b1b; color: #f2f2f2; font-weight: 700; font-size: 13px; letter-spacing: .04em; white-space: nowrap; }
 .keycap.ico svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
 dt.warn .keycap { background: var(--todo-ink); color: var(--todo-bg); }
+.keys { display: inline-flex; align-items: center; gap: 4px; }
+.keys .plus { font-weight: 700; color: var(--muted); }
+.item.machine { border-bottom: 1px solid var(--line); border-radius: var(--r) var(--r) 0 0; margin-bottom: 6px; }
+.model { font-size: 14px; color: var(--muted); letter-spacing: .04em; }
 dd.warn { font-weight: 700; color: var(--todo-ink); background: var(--todo-bg); padding: 4px 8px; border-radius: 4px; }
 .note { font-size: 15px; color: var(--muted); margin: 0 0 16px; max-width: 70ch; }
 
@@ -453,7 +457,12 @@ const I = {
   knob: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 12V4"/></svg>',
   key: '<svg viewBox="0 0 24 24"><rect x="8" y="5" width="8" height="14" rx="2"/></svg>',
   green: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" fill="#3cc463" stroke="none"/></svg>',
-  orange: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" fill="#f08a24" stroke="none"/></svg>'
+  orange: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" fill="#f08a24" stroke="none"/></svg>',
+  cup1: '<svg viewBox="0 0 24 24"><path d="M5 8h11v5a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5z"/><path d="M16 10h1.5a2 2 0 0 1 0 4H16"/></svg>',
+  cup2: '<svg viewBox="0 0 24 24"><path d="M2 10h8v3.5a3.5 3.5 0 0 1-3.5 3.5h-1A3.5 3.5 0 0 1 2 13.5z"/><path d="M11 7h8v3.5a3.5 3.5 0 0 1-3.5 3.5H14"/><path d="M19 8.5h1a1.5 1.5 0 0 1 0 3h-1"/></svg>',
+  spiral: '<svg viewBox="0 0 24 24"><path d="M12 12a1 1 0 0 1 1 1 2 2 0 0 1-2 2 3 3 0 0 1-3-3 4 4 0 0 1 4-4 5 5 0 0 1 5 5 6 6 0 0 1-6 6 7 7 0 0 1-7-7"/></svg>',
+  water: '<svg viewBox="0 0 24 24"><path d="M4 8h9a3 3 0 0 1 3 3v1.5"/><path d="M8 5v3"/><path d="M16 15.5c-1.1 1.6-1.7 2.5-1.7 3.2a1.7 1.7 0 0 0 3.4 0c0-.7-.6-1.6-1.7-3.2z"/></svg>',
+  gauge: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 12l4.5-4"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg>'
 };
 const PANEL = [
   { group: { en: "Steps", he: "שלבים" }, keys: [
@@ -512,6 +521,34 @@ const OVENS = [
     preheat: { en: "about 5 min, until the orange light goes off and the green one is on", he: "כ-5 דק', עד שהנורה הכתומה נכבית ונשארת הירוקה" },
     panel: PANEL_135, steps: STEPS_135 }
 ];
+
+// La Marzocco Linea Classic S (AV), from the La Marzocco manual and quick start guide.
+const MACHINE = {
+  name: { en: "Coffee machine", he: "מכונת הקפה" },
+  model: "La Marzocco Linea Classic S",
+  note: { en: "Every group has the same three buttons. The machine stays on overnight.", he: "לכל קבוצה יש אותם שלושה כפתורים. המכונה נשארת דולקת בלילה." },
+  panel: [
+    { group: { en: "Each group's buttons", he: "הכפתורים של כל קבוצה" }, keys: [
+      { icon: "cup1", en: "One cup: single espresso. It stops by itself; press again to stop early.", he: "כוס אחת: אספרסו יחיד. נעצר לבד; לחיצה נוספת עוצרת מוקדם." },
+      { icon: "cup2", en: "Two cups: double espresso. It stops by itself; press again to stop early.", he: "שתי כוסות: אספרסו כפול. נעצר לבד; לחיצה נוספת עוצרת מוקדם." },
+      { icon: "spiral", en: "Spiral: continuous. Water runs until you press it again.", he: "ספירלה: רציף. המים זורמים עד שלוחצים שוב." }
+    ] },
+    { group: { en: "Button combinations", he: "צירופי כפתורים" }, keys: [
+      { icons: ["spiral", "cup1"], en: "Cleaning cycle (with the blind portafilter). The display shows CLn, the group pulses about 10 times and stops by itself.", he: "מחזור ניקוי (עם ראש אפס). בתצוגה מופיע CLn, הקבוצה עושה כ-10 פולסים ונעצרת לבד." },
+      { icons: ["spiral", "cup2"], warn: true, en: "Turns the machine OFF. To turn it back on: two cups on the left group.", he: "מכבה את המכונה (OFF). להדלקה: שתי כוסות בקבוצה השמאלית." },
+      { icon: "spiral", key: "5s", warn: true, en: "Holding the spiral for 5 seconds opens the settings menu (PrG). Don't change anything: press two cups until End, then spiral.", he: "החזקה של ספירלה 5 שניות פותחת תפריט הגדרות (PrG). לא לשנות כלום: ללחוץ על שתי כוסות עד End, ואז ספירלה." }
+    ] },
+    { group: { en: "Steam and hot water", he: "אדים ומים חמים" }, keys: [
+      { icon: "knob", en: "Steam knobs (on both sides): turn slowly to open. Before and after every use, open for a second and wipe the wand with a damp cloth.", he: "ידיות אדים (בשני הצדדים): מסובבים לאט לפתיחה. לפני ואחרי כל שימוש, לפתוח לשנייה ולנגב את הסטימר בסמרטוט לח." },
+      { icon: "water", en: "Hot water: press to run hot water from the fixed spout, for a preset time.", he: "מים חמים: לחיצה מוציאה מים חמים מהברז הקבוע, לזמן שנקבע מראש." }
+    ] },
+    { group: { en: "Display and gauge", he: "תצוגה ומד לחץ" }, keys: [
+      { key: "93.5", en: "Display: the coffee boiler temperature. When all the button lights are on, the machine is ready.", he: "תצוגה: טמפרטורת דוד הקפה. כשכל נורות הכפתורים דולקות, המכונה מוכנה." },
+      { icon: "gauge", en: "Pressure gauge: top scale is steam (1.2–1.5 bar), bottom scale is brewing (about 9 bar while making coffee).", he: "מד לחץ: הסקאלה העליונה היא אדים (1.2–1.5 בר), התחתונה היא חליטה (כ-9 בר בזמן הכנת קפה)." },
+      { key: "0 · 1", warn: true, en: "Main switch (front left): don't touch. The machine stays on.", he: "מתג ראשי (מקדימה משמאל): לא לגעת. המכונה נשארת דולקת." }
+    ] }
+  ]
+};
 
 const BAKING = [
   { name: { en: "Rogalach", he: "רוגעלך" }, time: "23",
@@ -863,10 +900,24 @@ function renderBar() {
 }
 
 function renderDrinks() {
+  const isMachine = S.drink === "machine";
   const d = DRINKS.find(x => x.id === S.drink) || DRINKS[0];
   const steps = d.steps.filter(s => !s.group);
   const list = DRINKS.map(x =>
-    `<button class="item" data-drink="${x.id}" aria-current="${x.id === d.id}"><span>${t(x.name)}</span><span>${t(x.cup)}</span></button>`).join("");
+    `<button class="item" data-drink="${x.id}" aria-current="${!isMachine && x.id === d.id}"><span>${t(x.name)}</span><span>${t(x.cup)}</span></button>`).join("");
+  const machineBtn = `<button class="item machine" data-drink="machine" aria-current="${isMachine}"><span>${t(MACHINE.name)}</span><span></span></button>`;
+  if (isMachine) {
+    app.innerHTML = `<div class="drinks">
+      <nav class="list" aria-label="${t(UI.menu)}"><h2>${t(UI.menu)}</h2>${machineBtn}${list}</nav>
+      <article class="card">
+        <div class="card-head"><h2>${t(MACHINE.name)}</h2><span class="model" dir="ltr">${MACHINE.model}</span></div>
+        <p class="lede">${t(MACHINE.note)}</p>
+        <h4 class="sub-h">${t(UI.controls)}</h4>
+        ${panelHtml(MACHINE.panel)}
+      </article>
+    </div>`;
+    return;
+  }
   const specs = ["cup", "coffee", "milk", "time"].map(k =>
     `<div class="spec"><dt>${t(UI[k])}</dt><dd>${t(d[k])}</dd></div>`).join("");
 
@@ -891,7 +942,7 @@ function renderDrinks() {
   }
 
   app.innerHTML = `<div class="drinks">
-    <nav class="list" aria-label="${t(UI.menu)}"><h2>${t(UI.menu)}</h2>${list}</nav>
+    <nav class="list" aria-label="${t(UI.menu)}"><h2>${t(UI.menu)}</h2>${machineBtn}${list}</nav>
     <article class="card">
       <div class="card-head">
         <h2>${t(d.name)}</h2>
@@ -903,6 +954,11 @@ function renderDrinks() {
     </article>
   </div>`;
 }
+
+const keycap = (k) => (k.icons || (k.icon ? [k.icon] : [])).map(i => `<span class="keycap ico">${I[i]}</span>`).join(`<span class="plus">+</span>`)
+  + (k.key ? `<span class="keycap" dir="ltr">${k.key}</span>` : "");
+const panelHtml = (panel) => `<div class="panel">${panel.map(g => `<div class="pgroup"><h4>${t(g.group)}</h4><dl>${g.keys.map(k =>
+  `<dt class="${k.warn ? "warn" : ""}"><span class="keys">${keycap(k)}</span></dt><dd class="${k.warn ? "warn" : ""}">${t(k)}</dd>`).join("")}</dl></div>`).join("")}</div>`;
 
 const bakeTable = () => `<div class="tbl"><table class="bake">
   <thead><tr><th>${t(UI.item)}</th><th>${t(UI.bakeTime)}</th><th>${t(UI.finish)}</th></tr></thead>
@@ -925,8 +981,7 @@ function renderBaking() {
         <h4 class="sub-h">${t(UI.settings)}</h4>
         <dl class="specs three">${specs}</dl>
         <h4 class="sub-h">${t(UI.controls)}</h4>
-        <div class="panel">${o.panel.map(g => `<div class="pgroup"><h4>${t(g.group)}</h4><dl>${g.keys.map(k =>
-          `<dt class="${k.warn ? "warn" : ""}">${k.icon ? `<span class="keycap ico">${I[k.icon]}</span>` : `<span class="keycap" dir="ltr">${k.key}</span>`}</dt><dd class="${k.warn ? "warn" : ""}">${t(k)}</dd>`).join("")}</dl></div>`).join("")}</div>
+        ${panelHtml(o.panel)}
         ${o.steps ? `<h4 class="sub-h">${t(UI.howToBake)}</h4><ol class="checks">${o.steps.map(s => `<li>${t(s)}</li>`).join("")}</ol>` : ""}
       </section>
       ${BAKING.map(x => `<section class="card"><div class="pastry-head"><h3>${t(x.name)}</h3><span class="pill"><bdi dir="ltr">${x.time}</bdi> ${t(UI.min)}</span></div>
