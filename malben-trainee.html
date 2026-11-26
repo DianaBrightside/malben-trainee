@@ -177,6 +177,26 @@ dt.warn .keycap { background: var(--todo-ink); color: var(--todo-bg); }
 .keys .plus { font-weight: 700; color: var(--muted); }
 .item.machine { border-bottom: 1px solid var(--line); border-radius: var(--r) var(--r) 0 0; margin-bottom: 6px; }
 .model { font-size: 14px; color: var(--muted); letter-spacing: .04em; }
+.howto { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; margin-top: 4px; }
+.howto-step { background: var(--bg); border-radius: var(--r); padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+.howto-step .n { font-weight: 700; color: var(--accent-ink); background: var(--accent); border-radius: 50%; width: 26px; height: 26px; line-height: 26px; text-align: center; font-size: 14px; }
+.howto-step p { margin: 0; font-size: 15px; }
+.howto-step.dont { border: 2px solid var(--todo-ink); }
+.howto-step.dont .n { background: var(--todo-ink); color: var(--todo-bg); }
+.pad { align-self: center; display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 14px 18px; border-radius: 8px;
+  background: linear-gradient(180deg, #d9dcdf, #aeb3b8); box-shadow: inset 0 1px 0 #fff8, 0 1px 3px #0005; }
+.pad .lcd { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 15px; font-weight: 700; letter-spacing: .12em; color: #ff5a3c; background: #1a1a1a; border-radius: 3px; padding: 2px 10px; min-width: 54px; text-align: center; }
+.pad .row { display: flex; gap: 8px; }
+.pad .k { width: 40px; height: 46px; border-radius: 5px; background: #1b1b1b; color: #f2f2f2; display: grid; place-content: center; border: 2px solid #555; }
+.pad .k svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.pad .k.on { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 35%, transparent); }
+.howto-step.dont .pad .k.on { background: var(--todo-ink); color: var(--todo-bg); border-color: var(--todo-ink); box-shadow: 0 0 0 4px color-mix(in srgb, var(--todo-ink) 35%, transparent); }
+@media (prefers-reduced-motion: no-preference) {
+  .pad .k.on { animation: press 1.6s ease-in-out infinite; }
+  .pad .lcd.pulse { animation: blink 1s steps(2, start) infinite; }
+  @keyframes press { 50% { transform: translateY(2px) scale(.96); } }
+}
+@keyframes blink { to { visibility: hidden; } }
 dd.warn { font-weight: 700; color: var(--todo-ink); background: var(--todo-bg); padding: 4px 8px; border-radius: 4px; }
 .note { font-size: 15px; color: var(--muted); margin: 0 0 16px; max-width: 70ch; }
 
@@ -260,6 +280,9 @@ const UI = {
   item: { en: "Pastry", he: "מאפה" },
   min: { en: "min", he: "דק'" },
   seeBaking: { en: "Full baking guide", he: "מדריך אפייה מלא" },
+  cleanHow: { en: "How to run a cleaning cycle", he: "איך מפעילים מחזור ניקוי" },
+  seeCleaning: { en: "Show me the buttons", he: "להראות לי את הכפתורים" },
+  dontPress: { en: "Don't press", he: "לא ללחוץ" },
   fifo: { en: "FIFO: first in, first out. Older items are sold first.", he: "FIFO: מה שנכנס ראשון, יוצא ראשון. את הישנים מוכרים קודם." },
   clearTicks: { en: "Clear ticks", he: "ניקוי סימונים" },
   older: { en: "older", he: "ישן" },
@@ -528,6 +551,16 @@ const MACHINE = {
   ]
 };
 
+// Cleaning cycle, step by step, for the keypad drawing on the coffee machine page.
+// on: buttons to press (lit), display: what the screen shows. Keys are in the machine's order: cup1, cup2, spiral.
+const CLEAN_STEPS = [
+  { display: "93.5", on: [], en: "Put half a teaspoon of powder in the blind portafilter (ראש אפס) and lock it into the group.", he: "לשים חצי כפית אבקה בראש האפס ולהכניס אותו לקבוצה." },
+  { display: "93.5", on: ["spiral", "cup1"], en: "Press <b>spiral + one cup</b> together, on the same group.", he: "ללחוץ ביחד על <b>ספירלה + כוס אחת</b>, באותה קבוצה." },
+  { display: "CLn", on: [], pulse: true, en: "The display shows <b>CLn</b>. The group pulses about 10 times and stops by itself. Don't take the portafilter out!", he: "בתצוגה מופיע <b>CLn</b>. הקבוצה עושה כ-10 פולסים ונעצרת לבד. לא להוציא את הראש!" },
+  { display: "93.5", on: ["spiral", "cup1"], en: "Brush and rinse (see the closing routine), then run it again <b>without powder</b>: spiral + one cup.", he: "להבריש ולשטוף (לפי סגירת המשמרת), ואז שוב <b>בלי אבקה</b>: ספירלה + כוס אחת." }
+];
+const CLEAN_DONT = { display: "OFF", on: ["spiral", "cup2"], en: "<b>Spiral + two cups turns the machine off.</b> To turn it back on: two cups on the left group.", he: "<b>ספירלה + שתי כוסות מכבה את המכונה.</b> להדלקה: שתי כוסות בקבוצה השמאלית." };
+
 const BAKING = [
   { name: { en: "Rogalach", he: "רוגעלך" }, time: "23",
     finish: { en: "Pour sugar water over the top", he: "לשפוך מי סוכר מלמעלה" } },
@@ -693,7 +726,7 @@ const CLOSING = [
     ] },
   { title: { en: "Coffee machine", he: "מכונת קפה" },
     items: [
-      { note: true, en: "<b>Cleaning cycle</b> = press <b>spiral + one cup</b> together. The display shows <b>CLn</b>, the group pulses about 10 times and stops by itself (any button stops it early). <b>Spiral + two cups turns the machine OFF</b>, and holding the spiral alone for 5 seconds opens the settings menu (<b>PrG</b>): if that happens, press two cups until <b>End</b>, then spiral.", he: "<b>מחזור ניקוי</b> = ללחוץ ביחד על <b>ספירלה + כוס אחת</b>. בתצוגה מופיע <b>CLn</b>, הקבוצה עושה כ-10 פולסים ונעצרת לבד (כל כפתור עוצר מוקדם). <b>ספירלה + שתי כוסות מכבה את המכונה</b>, והחזקה של ספירלה לבד 5 שניות פותחת תפריט הגדרות (<b>PrG</b>): אם זה קרה, ללחוץ על שתי כוסות עד <b>End</b>, ואז ספירלה." },
+      { note: true, link: true, en: "<b>Cleaning cycle</b> = press <b>spiral + one cup</b> together. The display shows <b>CLn</b>, the group pulses about 10 times and stops by itself (any button stops it early). <b>Spiral + two cups turns the machine OFF</b>, and holding the spiral alone for 5 seconds opens the settings menu (<b>PrG</b>): if that happens, press two cups until <b>End</b>, then spiral.", he: "<b>מחזור ניקוי</b> = ללחוץ ביחד על <b>ספירלה + כוס אחת</b>. בתצוגה מופיע <b>CLn</b>, הקבוצה עושה כ-10 פולסים ונעצרת לבד (כל כפתור עוצר מוקדם). <b>ספירלה + שתי כוסות מכבה את המכונה</b>, והחזקה של ספירלה לבד 5 שניות פותחת תפריט הגדרות (<b>PrG</b>): אם זה קרה, ללחוץ על שתי כוסות עד <b>End</b>, ואז ספירלה." },
       { note: true, en: "<b>Never take the portafilter out during the cycle</b>: hot water with detergent sprays out. One group at a time, and not while another group is making coffee: the foam can overflow the drain.", he: "<b>לא להוציא את הראש בזמן המחזור</b>: יוצאים מים חמים עם חומר ניקוי. קבוצה אחת בכל פעם, ולא בזמן שקבוצה אחרת מכינה קפה: הקצף יכול להציף את הניקוז." },
       { en: "<b>Portafilters:</b> you can start about half an hour before closing, from the group furthest right. For each group:", he: "<b>סגירת ראשים:</b> אפשר להתחיל כחצי שעה לפני סגירה, מהראש הימני ביותר. לכל ראש:",
         sub: [
@@ -890,6 +923,8 @@ function renderDrinks() {
       <article class="card">
         <div class="card-head"><h2>${t(MACHINE.name)}</h2><span class="model" dir="ltr">${MACHINE.model}</span></div>
         <p class="lede">${t(MACHINE.note)}</p>
+        <h4 class="sub-h" id="clean-howto">${t(UI.cleanHow)}</h4>
+        ${cleanHowto()}
         <h4 class="sub-h">${t(UI.controls)}</h4>
         ${panelHtml(MACHINE.panel)}
       </article>
@@ -937,6 +972,12 @@ const keycap = (k) => (k.icons || (k.icon ? [k.icon] : [])).map(i => `<span clas
   + (k.key ? `<span class="keycap" dir="ltr">${k.key}</span>` : "");
 const panelHtml = (panel) => `<div class="panel">${panel.map(g => `<div class="pgroup"><h4>${t(g.group)}</h4><dl>${g.keys.map(k =>
   `<dt class="${k.warn ? "warn" : ""}"><span class="keys">${keycap(k)}</span></dt><dd class="${k.warn ? "warn" : ""}">${t(k)}</dd>`).join("")}</dl></div>`).join("")}</div>`;
+
+// A drawing of one group's keypad: display on top, then one cup, two cups, spiral (left to right, as on the machine).
+const pad = (st) => `<div class="pad" dir="ltr" aria-hidden="true"><div class="lcd ${st.pulse ? "pulse" : ""}">${st.display}</div>
+  <div class="row">${["cup1", "cup2", "spiral"].map(k => `<span class="k ${st.on.includes(k) ? "on" : ""}">${I[k]}</span>`).join("")}</div></div>`;
+const cleanHowto = () => `<div class="howto">${CLEAN_STEPS.map((st, i) => `<div class="howto-step"><span class="n">${i + 1}</span>${pad(st)}<p>${t(st)}</p></div>`).join("")}
+  <div class="howto-step dont"><span class="n">✕</span>${pad(CLEAN_DONT)}<p>${t(CLEAN_DONT)}</p></div></div>`;
 
 const bakeTable = () => `<div class="tbl"><table class="bake">
   <thead><tr><th>${t(UI.item)}</th><th>${t(UI.bakeTime)}</th><th>${t(UI.finish)}</th></tr></thead>
@@ -997,7 +1038,7 @@ function renderPhases(phases, id) {
   return `<ol class="phases">${phases.map((ph, p) => `<li><details>
     <summary><h4>${t(ph.title)}${ph.fifo ? ` <span class="tag">FIFO</span>` : ""}</h4><span class="count"></span></summary>
     <div class="phase-body">
-    <ul class="tasks">${ph.items.map((x, i) => x.rule ? `<li>${rule(x)}</li>` : x.note ? `<li class="task-note">${txt(x)}</li>` : task(x, `${id}.${p}.${i}`)).join("")}</ul>
+    <ul class="tasks">${ph.items.map((x, i) => x.rule ? `<li>${rule(x)}</li>` : x.note ? `<li class="task-note">${txt(x)}${x.link ? ` <button class="btn ghost sm" data-view="drinks" data-drink="machine">${t(UI.seeCleaning)}</button>` : ""}</li>` : task(x, `${id}.${p}.${i}`)).join("")}</ul>
     ${ph.fifo ? `<p class="small">${t(UI.fifo)}</p>` : ""}
     ${ph.bake ? bakeTable() + `<button class="btn ghost sm" data-view="baking">${t(UI.seeBaking)}</button>` : ""}
     </div>
@@ -1054,7 +1095,7 @@ document.addEventListener("click", (e) => {
     return;
   }
   if (el.id === "lang") S.lang = S.lang === "he" ? "en" : "he";
-  else if (el.dataset.view) S.view = el.dataset.view;
+  else if (el.dataset.view) { S.view = el.dataset.view; if (el.dataset.drink) S.drink = el.dataset.drink; }
   else if (el.dataset.drink) { S.drink = el.dataset.drink; S.step = 0; }
   else if (el.dataset.branch) S.branch = +el.dataset.branch;
   else if (el.dataset.oven) S.oven = +el.dataset.oven;
