@@ -1,4 +1,4 @@
-const CACHE = "malben-6f3960817618";
+const CACHE = "malben-9262b00e1316";
 const FILES = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "apple-touch-icon.png"];
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));
