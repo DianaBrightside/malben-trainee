@@ -117,7 +117,22 @@ main { padding-block: 28px 64px; }
 .phases summary::after { content: ""; flex: none; width: 8px; height: 8px; margin-inline: 4px; border-right: 2px solid var(--accent); border-bottom: 2px solid var(--accent); transform: translateY(-2px) rotate(45deg); transition: transform .15s; }
 .phases details[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
 .phases h4 { margin: 0; flex: 1; font-size: 17px; color: var(--brand); display: flex; align-items: center; gap: 8px; }
-.phases .count { font-size: 14px; color: var(--muted); white-space: nowrap; }
+.phases .count { font-size: 14px; color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.phases .count.all { color: var(--accent); font-weight: 700; }
+.phases .count.all::after { content: " ✓"; }
+.tasks { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.task { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 10px; align-items: start; }
+.task input { appearance: none; -webkit-appearance: none; margin: 2px 0 0; width: 22px; height: 22px; border: 2px solid var(--accent); border-radius: 5px; background: transparent; cursor: pointer; display: grid; place-content: center; }
+.task input::after { content: ""; width: 6px; height: 11px; border-right: 2.5px solid var(--accent-ink); border-bottom: 2.5px solid var(--accent-ink); transform: translateY(-1px) rotate(45deg); opacity: 0; }
+.task input:checked { background: var(--accent); }
+.task input:checked::after { opacity: 1; }
+.task input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.task > div { min-width: 0; }
+.task label { cursor: pointer; }
+.task:has(input:checked) > div { opacity: .5; }
+.tasks .rule { margin-inline-start: 32px; }
+.card-head.routine { margin-bottom: 4px; }
+.card-head.routine h3 { margin: 0; }
 .phase-body { padding: 0 0 18px; padding-inline-start: 40px; display: flex; flex-direction: column; align-items: stretch; gap: 8px; min-width: 0; }
 .phase-body > * { min-width: 0; }
 .phases + * { margin-top: 0; }
@@ -241,8 +256,7 @@ const UI = {
   min: { en: "min", he: "דק'" },
   seeBaking: { en: "Full baking guide", he: "מדריך אפייה מלא" },
   fifo: { en: "FIFO: first in, first out. Older items are sold first.", he: "FIFO: מה שנכנס ראשון, יוצא ראשון. את הישנים מוכרים קודם." },
-  task: { en: "1 task", he: "משימה אחת" },
-  tasks: { en: "tasks", he: "משימות" },
+  clearTicks: { en: "Clear ticks", he: "ניקוי סימונים" },
   older: { en: "older", he: "ישן" },
   newer: { en: "newer", he: "חדש" },
   branchNote: { en: "Drink recipes are the same in every branch. This page covers what changes from branch to branch.",
@@ -487,39 +501,42 @@ const BAKING = [
     finish: { en: "Sprinkle powdered sugar", he: "לפזר אבקת סוכר" } }
 ];
 
-const MUSIC = { en: "<b>Music.</b> Turn on the music.", he: "<b>מוזיקה.</b> להדליק מוזיקה." };
+// Routines. Each item is one task with a checkbox: a short bold label, then what to do.
+// Longer tasks split into sub: points. Items marked only: "<branch>" show only in that branch,
+// and add: { <branch>: ... } adds a sub-point for that branch (see forBranch).
+const MUSIC = { en: "<b>Music:</b> turn it on.", he: "<b>מוזיקה:</b> להדליק." };
 // Same in all three branches. Weizman swaps MUSIC for its own and adds steps (see OPENING_WEIZMAN).
 const SEATING = { title: { en: "Seating area", he: "אזור ישיבה" },
     items: [
-      { en: "<b>Outside.</b> Unlock the locks and take out the chains. Roll the chains up neatly, close them with the lock and put them back in their place.", he: "<b>בחוץ.</b> לפתוח את המנעולים ולהוציא את השרשראות. לגלגל אותן מסודר, לסגור עם המנעול ולהניח במקום." },
-      { en: "<b>Tables and chairs.</b> Open the tables and set the chairs evenly and neatly at every table.", he: "<b>סידור ישיבה.</b> לפתוח שולחנות ולסדר כיסאות באופן אחיד ומסודר בין כל השולחנות." },
-      { en: "<b>Cleaning.</b> Wipe every table. Pick up anything on the floor, and sweep if needed.", he: "<b>ניקיון.</b> מגבון על כל השולחנות. הרמת מפגעים מהרצפה, וטיאוט במקרה הצורך." },
-      { en: "<b>Ashtrays.</b> Put them out in the smoking area only.", he: "<b>מאפרות.</b> לפזר באזור העישון בלבד." },
-      { en: "<b>Sugar station.</b> Make sure it is clean and ready for the shift. Set out everything it needs and check it is all full:", he: "<b>עמדת סוכרים.</b> לוודא שהעמדה נקייה ומוכנה למשמרת. לסדר בעמדה כל מה שצריך ולוודא שהכול מלא:",
+      { en: "<b>Chains:</b> unlock, roll the chains up neatly, lock them and put them back.", he: "<b>שרשראות:</b> לפתוח מנעולים, לגלגל את השרשראות מסודר, לנעול ולהחזיר למקום." },
+      { en: "<b>Tables and chairs:</b> open the tables and set the chairs evenly.", he: "<b>שולחנות וכיסאות:</b> לפתוח שולחנות ולסדר כיסאות באופן אחיד." },
+      { en: "<b>Cleaning:</b> wet wipe on every table. Pick up anything on the floor, sweep if needed.", he: "<b>ניקיון:</b> מגבון על כל השולחנות. להרים מהרצפה, לטאטא אם צריך." },
+      { en: "<b>Ashtrays:</b> in the smoking area only.", he: "<b>מאפרות:</b> באזור העישון בלבד." },
+      { en: "<b>Sugar station:</b> clean and full:", he: "<b>עמדת סוכרים:</b> נקייה ומלאה:",
         groups: [
           { label: { en: "Refill", he: "למלא" }, chips: [{ en: "Lids", he: "מכסים" }, { en: "Napkins", he: "מפיות" }, { en: "Wet wipes", he: "מגבונים" }, { en: "Etc.", he: "וכו׳" }] }
         ] },
-      { en: "<b>Umbrellas, heaters and fans.</b> Open the umbrellas. Take out and turn on the heaters or fans (heaters in winter).", he: "<b>שמשיות ומאווררים.</b> לפתוח שמשיות. להוציא ולהדליק תנורים/מאווררים (תנורים בחורף)." },
+      { en: "<b>Umbrellas, heaters/fans:</b> open the umbrellas. Take out and turn on the heaters (winter) or fans.", he: "<b>שמשיות ותנורים/מאווררים:</b> לפתוח שמשיות. להוציא ולהדליק תנורים (בחורף) או מאווררים." },
       MUSIC
     ] };
 
 const CASHIER = { title: { en: "Cashier", he: "קופה" },
   items: [
-    { en: "<b>Cash float.</b> Bring the float from the safe, count the money and arrange it in the register. It must come to exactly <b>₪1,000</b>.", he: "<b>קרן.</b> להביא מהכספת את הקרן, לספור את הכסף ולסדר אותו בקופה. לוודא שיוצא <b>1,000 ש״ח</b> בדיוק." },
-    { en: "<b>Beecomm.</b> On the iPad, open the Beecomm app and tap <b>פתיחת קופה</b> (Open register).", he: "<b>ביקום.</b> לפתוח באייפד את האפליקציה של ביקום וללחוץ על <b>פתיחת קופה</b>." },
-    { en: "<b>Opening report.</b> Send the opening report to the group, using the template:", he: "<b>דוח פתיחה.</b> לשלוח בקבוצה דוח פתיחה לפי התבנית:",
+    { en: "<b>Cash float:</b> bring it from the safe, count it and arrange it in the register. Exactly <b>₪1,000</b>.", he: "<b>קרן:</b> להביא מהכספת, לספור ולסדר בקופה. בדיוק <b>1,000 ש״ח</b>." },
+    { en: "<b>Beecomm:</b> on the iPad, open Beecomm → <b>פתיחת קופה</b> (Open register).", he: "<b>ביקום:</b> באייפד, לפתוח את ביקום ← <b>פתיחת קופה</b>." },
+    { en: "<b>Opening report</b> to the group:", he: "<b>דוח פתיחה</b> בקבוצה:",
       sub: [
-        { en: "A photo of the display case (vitrina)", he: "צילום ויטרינה" },
+        { en: "A photo of the vitrina", he: "צילום ויטרינה" },
         { en: "Anything unusual, if there is", he: "דברים חריגים, אם יש" },
-        { en: "Notes for the closing shift, if there were any", he: "הערות לסגירה, אם היו" }
+        { en: "Notes for the closing shift, if any", he: "הערות לסגירה, אם היו" }
       ] }
   ] };
 
 // Same in all three branches.
 const COFFEE = { title: { en: "Coffee station", he: "עמדת קפה" },
     items: [
-      { en: "<b>Group heads.</b> Pull two double shots from each group head.", he: "<b>ראשים.</b> להוריד שתי מנות כפולות מכל ראש." },
-      { en: "<b>Steam wands.</b> Open each steam wand for a few seconds to release the pressure, then wipe it with a clean cloth.", he: "<b>סטימרים.</b> לפתוח כל סטימר לכמה שניות כדי לשחרר לחץ, ואז לנגב עם סמרטוט נקי." },
+      { en: "<b>Group heads:</b> two double shots from each head.", he: "<b>ראשים:</b> שתי מנות כפולות מכל ראש." },
+      { en: "<b>Steam wands:</b> open each one for a few seconds to release the pressure, then wipe with a clean cloth.", he: "<b>סטימרים:</b> לפתוח כל סטימר לכמה שניות לשחרור לחץ, ולנגב בסמרטוט נקי." },
       { en: "<b>Take out of the fridges:</b>", he: "<b>להוציא מהמקררים:</b>",
         groups: [
           { label: { en: "Milks", he: "חלבים" }, chips: [{ en: "Regular", he: "רגיל" }, { en: "Low-fat", he: "דל" }, { en: "Almond", he: "שקדים" }, { en: "Soy", he: "סויה" }, { en: "Oat", he: "שיבולת" }] },
@@ -527,11 +544,11 @@ const COFFEE = { title: { en: "Coffee station", he: "עמדת קפה" },
           { label: { en: "Syrups", he: "סירופים" }, chips: [{ en: "Vanilla", he: "וניל" }, { en: "Strawberry", he: "תות" }, { en: "Caramel", he: "קרמל" }] },
           { label: { en: "Garnishes", he: "גרנישים" }, chips: [{ en: "If there are any", he: "אם יש" }] }
         ] },
-      { en: "<b>Garnish station.</b> Fill it up so everything is ready to use:", he: "<b>עמדת גרנישים.</b> למלא כך שהכול מוכן לשימוש:",
+      { en: "<b>Garnish station:</b>", he: "<b>עמדת גרנישים:</b>",
         sub: [
           { en: "Cinnamon sticks: refill", he: "מקלות קינמון: למלא" },
           { en: "Lemon: slice", he: "לימון: לחתוך" },
-          { en: "Mint: pick the leaves apart and cut into neat sprigs", he: "נענע: להפריד ולחתוך לתפרחות יפות" }
+          { en: "Mint: pick apart into neat sprigs", he: "נענע: להפריד ולחתוך לתפרחות יפות" }
         ] }
     ] };
 
@@ -539,31 +556,31 @@ const OPENING_WEIZMAN = [
   { title: { en: "Display case (vitrina)", he: "ויטרינה" },
     fifo: true,
     items: [
-      { en: "<b>Fill the vitrina.</b> Take all of yesterday's products out of the fridge and put them in the vitrina. Leave room for the new products.", he: "<b>מילוי ויטרינה.</b> מוציאים מהמקרר את כל המוצרים מאתמול וממלאים בוויטרינה. משאירים מקום למוצרים החדשים." },
-      { en: "<b>Bring what's missing.</b> Go to the patisserie (קונדיטוריה) and bring the missing products from the fridge.", he: "<b>הוצאת מוצרי ויטרינה.</b> הולכים לקונדיטוריה ומביאים חוסרים מהמקרר.",
+      { en: "<b>Yesterday's products:</b> from the fridge into the vitrina. Leave room for the new ones.", he: "<b>מוצרים מאתמול:</b> מהמקרר לוויטרינה. להשאיר מקום לחדשים." },
+      { en: "<b>What's missing:</b> bring it from the fridge in the patisserie (קונדיטוריה).", he: "<b>חוסרים:</b> להביא מהמקרר בקונדיטוריה.",
         sub: [ TODO("To add: how to find each product, where it is in the fridge, what gets piped and how", "להוסיף: איך מוצאים כל מוצר, מאיפה לוקחים מהמקרר, מה מזלפים ואיך") ] },
-      { en: "<b>Arrange pastries and sandwiches by FIFO.</b> Put the new products (from the inside fridge or the patisserie) at the front. Yesterday's products stay closest to us, the new ones closest to the customers. Keep everything straight and neat.", he: "<b>סידור מאפים וכריכים לפי FIFO.</b> את החוסרים (ממקרר פנימי או מהקונדיטוריה) מסדרים מקדימה. המוצרים מאתמול מוצגים הכי קרוב אלינו, והחדשים הכי קרוב ללקוחות. כמובן לסדר הכול ישר ואסתטי." },
+      { en: "<b>Arrange by FIFO:</b> yesterday's closest to us, new ones closest to the customers. Straight and neat.", he: "<b>סידור לפי FIFO:</b> מאתמול הכי קרוב אלינו, החדשים הכי קרוב ללקוחות. ישר ואסתטי." },
       { rule: true, en: "", he: "", a: { en: "Closest to us", he: "הכי קרוב אלינו" }, b: { en: "Closest to customers", he: "הכי קרוב ללקוחות" } },
-      { en: "<b>Check how it looks.</b> Go outside and look at the vitrina from the front. Make sure all the signs are in place and everything looks clean and tidy.", he: "<b>בדיקת נראות.</b> יוצאים להסתכל על הוויטרינה מבחוץ. מוודאים שכל השלטים במקומם והכול נראה נקי ומסודר." }
+      { en: "<b>Check from outside:</b> all signs in place, clean and tidy.", he: "<b>בדיקה מבחוץ:</b> כל השלטים במקום, נקי ומסודר." }
     ] },
   { title: { en: "Prepare the station", he: "הכנת העמדה" },
     items: [
-      { en: "Turn on the toaster.", he: "להדליק את הטוסטר." },
-      { en: "Take the olives out of the fridge.", he: "להוציא זיתים מהמקרר." },
-      { en: "Make sure there's a cutting board, a knife and tongs.", he: "לוודא שיש קרש חיתוך, סכין ומלקחיים." }
+      { en: "<b>Toaster:</b> turn it on.", he: "<b>טוסטר:</b> להדליק." },
+      { en: "<b>Olives:</b> out of the fridge.", he: "<b>זיתים:</b> להוציא מהמקרר." },
+      { en: "<b>Tools:</b> cutting board, knife and tongs are there.", he: "<b>כלים:</b> לוודא שיש קרש חיתוך, סכין ומלקחיים." }
     ] },
   { title: { en: "Products from the kitchen window", he: "הורדת מוצרים מהחלון" },
     items: [
-      { en: "During opening, the kitchen puts products on the window. Take each product down right away and put it in its place.", he: "במהלך הפתיחה המטבח שם מוצרים על החלון. מורידים מיד כל מוצר מהחלון ומסדרים אותו במקומו." }
+      { en: "<b>Kitchen window:</b> take every product down as soon as it arrives and put it in its place.", he: "<b>חלון המטבח:</b> כל מוצר שמגיע לחלון להוריד מיד ולסדר במקומו." }
     ] },
   { ...COFFEE, items: [...COFFEE.items,
-    { en: "<b>Orange juice machine.</b> Fill the machine with oranges and turn it on. Make sure there's a jug for the juice.", he: "<b>מכונת תפוזים.</b> למלא תפוזים במכונה ולהדליק אותה. לוודא שיש כד למיץ." },
-    { en: "<b>Jerrycans.</b> Check how many jerrycans need to go to the branches and get them ready.", he: "<b>ג׳ריקנים.</b> לבדוק כמה ג׳ריקנים צריך לשלוח לסניפים ולהכין אותם." }
+    { en: "<b>Orange juice machine:</b> fill with oranges and turn on. Make sure there's a jug.", he: "<b>מכונת תפוזים:</b> למלא תפוזים ולהדליק. לוודא שיש כד." },
+    { en: "<b>Jerrycans:</b> check how many the branches need and get them ready.", he: "<b>ג׳ריקנים:</b> לבדוק כמה צריך לסניפים ולהכין." }
   ] },
   { ...SEATING, items: [...SEATING.items.filter(x => x !== MUSIC),
-    { en: "<b>Awnings and ceiling fans.</b> Open the awnings and turn on the ceiling fans.", he: "<b>מרקיזות ומאווררי תקרה.</b> לפתוח מרקיזות ומאווררי תקרה." },
-    { en: "<b>Buzzers.</b> Move the buzzers to the cashier.", he: "<b>זמזמים.</b> להעביר את הזמזמים לקופה." },
-    { en: "<b>Music.</b> Turn on the music, outside too!", he: "<b>מוזיקה.</b> להדליק מוזיקה, גם בחוץ!" }
+    { en: "<b>Awnings and ceiling fans:</b> open and turn on.", he: "<b>מרקיזות ומאווררי תקרה:</b> לפתוח ולהדליק." },
+    { en: "<b>Buzzers:</b> move them to the cashier.", he: "<b>זמזמים:</b> להעביר לקופה." },
+    { en: "<b>Music:</b> turn it on, outside too!", he: "<b>מוזיקה:</b> להדליק, גם בחוץ!" }
   ] },
   CASHIER
 ];
@@ -571,23 +588,23 @@ const OPENING_WEIZMAN = [
 const OPENING_K50 = [
   { title: { en: "Arrive", he: "הגעה" },
     items: [
-      { en: "Take the key from the locker on the left of the entrance. Get the code from your shift manager.", he: "לקחת את המפתח מהלוקר משמאל לכניסה. את הקוד מקבלים מהאחראי/ת משמרת." },
-      { en: "Clock in: tap your phone on the Beecomm NFC sticker on the wall.", he: "להיכנס למערכת: להצמיד את הטלפון למדבקת ה-NFC של Beecomm על הקיר." }
+      { en: "<b>Key:</b> in the locker left of the entrance. The code is with your shift manager.", he: "<b>מפתח:</b> בלוקר משמאל לכניסה. את הקוד מקבלים מהאחראי/ת משמרת." },
+      { en: "<b>Clock in:</b> tap your phone on the Beecomm NFC sticker on the wall.", he: "<b>כניסה למערכת:</b> להצמיד את הטלפון למדבקת ה-NFC של Beecomm על הקיר." }
     ] },
   { title: { en: "Display case (vitrina)", he: "ויטרינה" },
     fifo: true,
     items: [
-      { en: "<b>Sandwiches.</b> First put yesterday's sandwiches from the vitrina box into the display, then fill the rest with new ones.", he: "<b>כריכים.</b> קודם להכניס לוויטרינה את הכריכים שנשארו בקופסת הוויטרינה, ואז להשלים בכריכים חדשים." },
+      { en: "<b>Sandwiches:</b> first the ones left in the vitrina box, then new ones.", he: "<b>כריכים:</b> קודם מה שנשאר בקופסת הוויטרינה, ואז חדשים." },
       { rule: true, en: "We sell from right to left", he: "מוכרים מימין לשמאל", a: { en: "Right", he: "ימין" }, b: { en: "Left", he: "שמאל" } },
-      { en: "<b>Desserts.</b> Put the leftover desserts from the box into the display first.", he: "<b>קינוחים.</b> קודם להכניס לוויטרינה את הקינוחים שנשארו בקופסה." },
+      { en: "<b>Desserts:</b> first the ones left in the box.", he: "<b>קינוחים:</b> קודם מה שנשאר בקופסה." },
       { rule: true, en: "", he: "", a: { en: "Door side", he: "צד הדלת" }, b: { en: "Window side", he: "צד החלון" } }
     ] },
   { title: { en: "Bake the pastries", he: "אפיית מאפים" },
     bake: true,
     items: [
-      { en: "Turn on the oven: 165°C, fan on 1, heat for 5 minutes.", he: "להדליק את התנור: 165°C, מאוורר על 1, לחמם 5 דקות." },
-      { en: "Check Limor's WhatsApp message for how many to bake.", he: "לבדוק בהודעת הוואטסאפ של לימור כמה לאפות." },
-      { en: "Bake, take each tray out on time, finish and put on its tray:", he: "לאפות, להוציא כל מגש בזמן, לעשות גימור ולהניח על המגש שלו:" }
+      { en: "<b>Oven:</b> 165°C, fan on 1, heat for 5 minutes.", he: "<b>תנור:</b> 165°C, מאוורר על 1, לחמם 5 דקות." },
+      { en: "<b>How many:</b> see Limor's WhatsApp message.", he: "<b>כמה לאפות:</b> לפי הודעת הוואטסאפ של לימור." },
+      { en: "<b>Bake:</b> take each tray out on time, finish it and put it on its tray:", he: "<b>אפייה:</b> להוציא כל מגש בזמן, גימור, ולהניח על המגש שלו:" }
     ] },
   COFFEE,
   SEATING,
@@ -596,90 +613,142 @@ const OPENING_K50 = [
 
 // Same as Katzenelson 50, except the oven step (Tecnoeka, see STEPS_135).
 const OPENING_K135 = OPENING_K50.map(ph => !ph.bake ? ph : { ...ph, items: [
-  { en: "Turn on the oven: left knob to ∞, right knob to about 170°C. Wait about 5 minutes, until the orange light goes off.", he: "להדליק את התנור: כפתור שמאלי ל-∞, כפתור ימני לכ-170°C. לחכות כ-5 דקות, עד שהנורה הכתומה נכבית." },
+  { en: "<b>Oven:</b> left knob to ∞, right knob to about 170°C. Wait about 5 minutes, until the orange light goes off.", he: "<b>תנור:</b> כפתור שמאלי ל-∞, כפתור ימני לכ-170°C. לחכות כ-5 דקות, עד שהנורה הכתומה נכבית." },
   ...ph.items.slice(1)
 ] });
-// Same in all three branches. Items marked only: "<branch>" show only there, and
-// add: { <branch>: ... } adds a point under an item for that branch (see forBranch).
+
+// Same in all three branches; each branch gets it through forBranch.
 const CLOSING = [
   { title: { en: "Before closing", he: "לפני הסגירה" },
     items: [
-      { en: "<b>Waste report:</b> every product that isn't kept for tomorrow goes into the waste report, and gets a 50% discount sign.", he: "<b>יצירת דוח פחת:</b> כל המוצרים שלא נשמרים למחר להכניס לדוח פחת, ולשים עליהם שלטון 50% הנחה." }
+      { en: "<b>Waste report:</b> everything not kept for tomorrow goes into the waste report and gets a 50% discount sign.", he: "<b>דוח פחת:</b> כל מה שלא נשמר למחר נכנס לדוח פחת ומקבל שלטון 50% הנחה." }
     ] },
   { title: { en: "Take apart and clean the vitrina", he: "פירוק וניקוי הוויטרינה" },
     items: [
-      { en: "Share the waste between the staff", he: "חלוקת פחת בין העובדים" },
-      { en: "Turn off the toaster and send to washing: the salamander racks, tongs, spatula, פס בונים, cutting board, etc.", he: "כיבוי טוסטר ושליחה לשטיפה של רשתות סלמנדרה, מלקחיים, שפכטל, פס בונים, קרש חיתוך וכו'." },
-      { en: "<b>Mark the paninis:</b> bring two trays from the washing area and put baking paper on them. Take all the paninis out of the vitrina, mark them with a marker on the bottom side and lay them neatly on one tray.", he: "<b>סימון פניני:</b> להביא שתי פיילות מהשטיפה, לשים עליהן נייר אפיה. להוציא את כל הפניני מהויטרינה ולסמן בטוש על הצד התחתון ולהניח במסודר בפיילה אחת." },
-      { en: "<b>Take out the pastries:</b> on the second tray, lay out neatly all the sweet pastries that are kept, except the מלבנים! The מלבנים go back into the מלבנים box. Cover the trays and put them in the fridge under the vitrina.", he: "<b>הוצאת מאפים:</b> בפיילה השניה להניח מסודר את כל המאפים המתוקים שנשמרים חוץ ממלבנים! מלבנים להחזיר לקופסת המלבנים. לסגור פיילות ולהכניס למקרר מתחת לויטרינה." },
-      { en: "<b>Fold the signs:</b> fold all the signs and put them aside neatly", he: "<b>קיפול שלטונים:</b> לקפל את כל השלטונים הצידה באופן מסודר" },
-      { en: "<b>Send the trays to washing:</b> and take out the vitrina doors and the wooden boards.", he: "<b>שליחת מגשים לשטיפה:</b> ולהוציא את הדלתות של הויטרינות והקרשי עץ." },
-      { en: "<b>Spray and paper on every surface:</b> spray blue cleaner on every surface (top, sides, inside and outside) and wipe thoroughly with paper so no marks are left. Also wipe the door rails, and between the rails and the glass.", he: "<b>שפריצר ונייר על כל המשטחים:</b> ריסוס חומר כחול על כל המשטחים (מלמעלה, מהצדדים, מבפנים ומבחוץ) וניגוב יסודי עם נייר ללא השארת סימנים. לשים לנגב גם את המסילות של הדלתות, ובין המסילות לזכוכית." },
-      { en: "<b>Put the clean trays back:</b> dry them completely with paper and put them back in their exact place in the vitrina.", he: "<b>החזרת המגשים הנקיים:</b> ייבוש מוחלט שלהם עם נייר והחזרתם למקום המדויק בוויטרינה." },
-      { en: "<b>Paper and signs:</b> put paper on the trays that need it and set the signs in their places", he: "<b>נייר ושלטונים:</b> לשים נייר על המגשים הרלוונטים וסידור שלטונים במקומם" },
-      { en: "Cut brown paper for the pastry trays", he: "לגזור נייר חום למגשי המאפים" }
+      { en: "<b>Waste:</b> share it between the staff.", he: "<b>פחת:</b> חלוקה בין העובדים." },
+      { en: "<b>Toaster:</b> turn it off. Send to washing: salamander racks, tongs, spatula, פס בונים, cutting board etc.", he: "<b>טוסטר:</b> לכבות. לשטיפה: רשתות סלמנדרה, מלקחיים, שפכטל, פס בונים, קרש חיתוך וכו׳." },
+      { en: "<b>Paninis:</b> two trays from the washing area with baking paper. Mark every panini on the bottom with a marker and lay them neatly on one tray.", he: "<b>פניני:</b> שתי פיילות מהשטיפה עם נייר אפייה. לסמן כל פניני בטוש על הצד התחתון ולסדר בפיילה אחת." },
+      { en: "<b>Sweet pastries:</b> on the second tray, except the מלבנים! They go back in the מלבנים box. Cover the trays and put them in the fridge under the vitrina.", he: "<b>מאפים מתוקים:</b> בפיילה השנייה, חוץ ממלבנים! מלבנים חוזרים לקופסת המלבנים. לסגור את הפיילות ולהכניס למקרר מתחת לוויטרינה." },
+      { en: "<b>Signs:</b> fold them and put them aside neatly.", he: "<b>שלטונים:</b> לקפל ולהניח בצד מסודר." },
+      { en: "<b>To washing:</b> the trays. Take out the vitrina doors and the wooden boards.", he: "<b>לשטיפה:</b> המגשים. להוציא את דלתות הוויטרינות וקרשי העץ." },
+      { en: "<b>Surfaces:</b> blue spray on every surface (top, sides, inside and out), wipe with paper until no marks are left. Also the door rails and between the rails and the glass.", he: "<b>משטחים:</b> שפריצר כחול על כל המשטחים (למעלה, בצדדים, בפנים ובחוץ) וניגוב בנייר בלי סימנים. גם המסילות של הדלתות ובין המסילות לזכוכית." },
+      { en: "<b>Clean trays:</b> dry them completely with paper and put each back in its exact place.", he: "<b>מגשים נקיים:</b> לייבש לגמרי בנייר ולהחזיר למקום המדויק בוויטרינה." },
+      { en: "<b>Paper and signs:</b> paper on the trays that need it, signs back in place.", he: "<b>נייר ושלטונים:</b> נייר על המגשים הרלוונטיים, שלטונים במקום." },
+      { en: "<b>Brown paper:</b> cut it for the pastry trays.", he: "<b>נייר חום:</b> לגזור למגשי המאפים." }
     ] },
   { title: { en: "Clean the toaster station", he: "ניקוי עמדת טוסטר" },
     items: [
-      { en: "Put the olives in the fridge.", he: "להכניס זיתים למקרר." },
-      { en: "<b>Salamander:</b> scrubber and soap on the inside of the salamander, and spray on the outside so it shines!", he: "<b>סלמנדרה:</b> סקוץ סבון על הבפנים של הסלמנדרה ושפריצר על החוץ שיבריק!" },
-      { en: "<b>Toaster:</b> scrubber with soap and almost no water! Inside the toaster and on the sides. Spray and paper on the outside.", he: "<b>טוסטר:</b> סקוץ עם סבון וכמעט בלי מים! בתוך הטוסטר, בצדדים. שפריצר ונייר על החלק החיצוני." },
-      { en: "<b>Clean the work surface:</b> scrubber and soap on the whole work surface. Move the salamander and toaster and clean behind them. Wipe everything with dry paper and put everything back in its place.", he: "<b>ניקוי משטח עבודה:</b> סקוץ סבון על כל משטח העבודה, להזיז סלמנדרה וטוסטר ולנקות מאחורה. לנגב הכל עם נייר יבש ולהחזיר הכל למקום." },
-      { en: "<b>Clean the fridges:</b> go over all the fridges and doors with blue spray. If needed, also go over them with stainless steel spray.", he: "<b>ניקוי מקררים:</b> מעבר עם שפריצר כחול על כל המקררים והדלתות נירוסטה, אם יש צורך גם לעבור עם ספריי נירוסטה." }
+      { en: "<b>Olives:</b> into the fridge.", he: "<b>זיתים:</b> להכניס למקרר." },
+      { en: "<b>Salamander:</b> scrubber and soap inside, spray outside. Make it shine!", he: "<b>סלמנדרה:</b> סקוץ וסבון בפנים, שפריצר בחוץ. שיבריק!" },
+      { en: "<b>Toaster:</b> scrubber and soap, almost no water! Inside and on the sides. Spray and paper outside.", he: "<b>טוסטר:</b> סקוץ וסבון, כמעט בלי מים! בפנים ובצדדים. שפריצר ונייר בחוץ." },
+      { en: "<b>Work surface:</b> scrubber and soap. Move the salamander and toaster and clean behind them. Dry with paper and put everything back.", he: "<b>משטח עבודה:</b> סקוץ וסבון. להזיז סלמנדרה וטוסטר ולנקות מאחור. לייבש בנייר ולהחזיר הכל." },
+      { en: "<b>Fridges:</b> blue spray on the fridges and doors. Stainless steel spray if needed.", he: "<b>מקררים:</b> שפריצר כחול על המקררים והדלתות. ספריי נירוסטה אם צריך." }
     ] },
   { title: { en: "Sort and organise", he: "סידור וארגון" },
     items: [
-      { en: "Put all the clean tools back from the washing area: and check there are: tongs, cutting board, knives, spoons", he: "להחזיר את כל הכלים הנקיים מהשטיפה: ולוודא שיש: מלקחיים, קרש חיתוך, סכינים, כפות" },
-      { en: "<b>Check the station stock:</b> napkins, panini bags, small trays, large trays with paper, granola and coconut.", he: "<b>לוודא מלאי עמדה:</b> מפיות, שקיות פניני, מגשים קטנים, מגשים גדולים עם נייר, גרנולה וקוקוס." }
+      { en: "<b>Clean tools:</b> bring them back from washing and check there are:", he: "<b>כלים נקיים:</b> להחזיר מהשטיפה ולוודא שיש:",
+        groups: [ { label: { en: "Tools", he: "כלים" }, chips: [{ en: "Tongs", he: "מלקחיים" }, { en: "Cutting board", he: "קרש חיתוך" }, { en: "Knives", he: "סכינים" }, { en: "Spoons", he: "כפות" }] } ] },
+      { en: "<b>Station stock:</b> check it's full:", he: "<b>מלאי עמדה:</b> לוודא שיש:",
+        groups: [ { label: { en: "Stock", he: "מלאי" }, chips: [{ en: "Napkins", he: "מפיות" }, { en: "Panini bags", he: "שקיות פניני" }, { en: "Small trays", he: "מגשים קטנים" }, { en: "Large trays with paper", he: "מגשים גדולים עם נייר" }, { en: "Granola", he: "גרנולה" }, { en: "Coconut", he: "קוקוס" }] } ] }
     ] },
   { title: { en: "Coffee machine", he: "מכונת קפה" },
     items: [
-      { en: "<b>Closing the group heads:</b> you can start about half an hour before closing. Start from the head furthest to the right.", he: "<b>סגירת ראשים:</b> ניתן להתחיל כחצי שעה לפני סגירה. להתחיל מהראש הימני ביותר.",
+      { en: "<b>Group heads:</b> you can start about half an hour before closing, from the head furthest right. For each head:", he: "<b>סגירת ראשים:</b> אפשר להתחיל כחצי שעה לפני סגירה, מהראש הימני ביותר. לכל ראש:",
         sub: [
-          { en: "<b>Switch to the blind head:</b> shake the head in the rail under running water, then go over it with a brush, also under running water. Put in half a teaspoon of powder and run a cleaning cycle. (Long press on the spiral button and, while holding it, a short press on double espresso).", he: "<b>להחליף לראש אפס:</b> לשקשק את הראש בתוך המסילה עם מים זורמים, ואז מעבר עם מברשת גם כן עם מים זורמים. לשים חצי כפית אבקה ולהפעיל מחזור ניקוי. (לחיצה ארוכה על כפתור ספירלה ותוך כדי לחיצה קצרה על אספרסו כפול)." },
-          { en: "<b>When the cleaning cycle ends:</b> scrub the head and the rail with the brush. Shake the head with the cleaning powder, then run clean water. Go over the rail with a cloth and check no dirt is left.", he: "<b>כשנגמר מחזור הניקוי:</b> לשפשף עם המברשת את הראש ואת המסילה. לשקשק עם החומר ניקוי את הראש, ואז להוריד מים נקיים. לעבור עם סמרטוט במסילה ולראות שלא נשאר עוד לכלוך." },
-          { en: "<b>Clean cleaning cycle:</b> run another cleaning cycle without powder", he: "<b>מחזור ניקוי נקי:</b> להריץ עוד מחזור ניקוי בלי חומר" }
+          { en: "Switch to the blind head. Shake the head in the rail and brush it, under running water.", he: "להחליף לראש אפס. לשקשק את הראש במסילה ולהבריש, עם מים זורמים." },
+          { en: "Half a teaspoon of powder → cleaning cycle (long press on the spiral button, and meanwhile a short press on double espresso).", he: "חצי כפית אבקה ← מחזור ניקוי (לחיצה ארוכה על כפתור ספירלה ותוך כדי לחיצה קצרה על אספרסו כפול)." },
+          { en: "When it ends: brush the head and rail, shake the head with the powder, then run clean water. Wipe the rail with a cloth until no dirt is left.", he: "כשנגמר: לשפשף ראש ומסילה במברשת, לשקשק את הראש עם החומר ולהוריד מים נקיים. לנגב את המסילה בסמרטוט עד שאין לכלוך." },
+          { en: "Run another cleaning cycle without powder.", he: "להריץ עוד מחזור ניקוי בלי חומר." }
         ] },
-      { en: "<b>At closing:</b> close the group heads as described above", he: "<b>כשסוגרים:</b> סגירת ראשים כמפורט למעלה" },
-      { en: "<b>Empty and clean the grinder:</b> close the grinder's slide, take out the hopper and empty it into an empty coffee bag, and close it with stickers. Wipe the grinder hopper with dry paper and put it back. Put the closed bag with the beans inside the hopper and close it. Clean all the coffee crumbs off the grinder, and make sure to clean the part that holds the scoop.", he: "<b>ריקון וניקוי מטחנה:</b> לסגור את הלשון של המטחנה, להוציא את הכד ולרוקן אותו לתוך שקית קפה ריקה, ולסגור עם מדבקות. לנגב כד מטחנה עם נייר יבש, ולהחזיר למקום. את השקית הסגורה עם הפולים להניח בתוך הכד ולסגור אותו. לנקות מטחנה מכל פירורי הקפה, לשים לב לנקות את החלק שמחזיק את הכף." },
-      { en: "<b>Into the fridge:</b> milks, iced tea, syrups, garnishes", he: "<b>הכנסה לקירור:</b> חלבים, תה קר, סירופים, גרנישים" },
-      { en: "<b>Send to washing:</b> milk pitchers, rubber mats, ice scoops, coffee bin, foam cup and spoon, פס בונים, group heads (take apart and wash by hand with a scrubber and soap) and the drip rail (carefully, so it doesn't spill over everything)", he: "<b>שליחה לשטיפה:</b> כדי חלב, שטיחי גומי, כפות קרח, פח קפה, כוס וכף קצף, פס בונים ראשים (מפרקים ושוטפים ידנית עם סקוץ וסבון) ומסילת ניקוז (בזהירות שלא ישפך על הכל)" },
-      { en: "<b>Clean the steam wands:</b> fill a cup with water and add a capful of the blue steam wand cleaner. Put the steam wand into the cup, open the pressure and close it in pulses, 10 times. Leave it soaking in the blue cleaner for about ten minutes. Take out the cup and wipe the dried milk off the steam wand with a clean cloth. Also move the rubber grip and clean around it. Pay attention to the bottom tip of the steam wand and clean it well.", he: "<b>ניקוי סטימרים:</b> למלא כוס במים ולשים פקק חומר כחול של סטימרים. להכניס סטימר לתוך הכוס ולפתוח את הלחץ ולסגור בפולסים 10 פעמים. להשאיר אותו מושרה בחומר הכחול לכעשר דקות. להוציא את הכוס ולנגב עם סמרטוט נקי את הסטימר משאריות חלב יבש, גם להזיז את גומי האחיזה ולנקות מסביבו. לשים לב לתת תשומת לב לקצה התחתון של הסטימר ולנקות אותו היטב." },
-      { en: "<b>Deep clean:</b> scrubber and soap on the whole surface under and around the machine, and on the machine itself: the front, behind the group heads, the sides, the top where there are no cups, the steam wand handle. Wipe everything with a squeegee and then dry paper. If marks are left on the machine's stainless steel, go over it with blue spray and paper until it shines on every side.", he: "<b>ניקוי יסודי:</b> סקוץ' וסבון על כל המשטח מתחת ומסביב למכונה ועל המכונה עצמה - קדמת המכונה, מאחורי הראשים, צידי המכונה, מעל המכונה איפה שאין כוסות, ידית הסטימר. לנגב הכל עם מגב ואז נייר יבש. אם נשארו סימנים על הנירוסטה של המכונה לעבור עם ספריי כחול ונייר עד שהיא מבריקה מכל הצדדים.",
-        add: { weizman: { en: "Go out from behind the bar and clean the counter and the back of the coffee machine from the outside", he: "לצאת מהבר ולנקות את השיש והגב של המכונת קפה מבחוץ" } } },
-      { en: "<b>Clean the cupboards:</b> scrubber and soap on the cupboards under and around the coffee machine, and on the ice machine. Wipe everything with paper until it's completely clean. In all branches, clean the milk drawers.", he: "<b>ניקוי ארונות:</b> סקוץ וסבון על הארונות מתחת ובסביבת המכונת קפה, ועל המכונת קרח. לנגב הכל עם נייר עד שנקי לגמרי. בכל הסניפים לנקות את המגירות של החלב.",
-        add: { weizman: { en: "Clean the top of the ice machine, under the counter, with a scrubber.", he: "לנקות עם סקוץ את הגג של מכונת הקרח, מתחת לשיש." }, k135: { en: "Go over the outside of the dishwasher.", he: "לעבור על חוץ המדיח." } } },
-      { en: "<b>Clean the condiment station (צ'קר):</b> wipe the surface, clean the cinnamon shaker, clean the honey lid. Make sure the station is full (straws, stirrers etc.)", he: "<b>ניקוי צ'קר:</b> ניגוב משטח, ניקוי כלי קינמון, ניקוי מכסה של דבש. לוודא שעמדה מלאה (קשים בוחשנים וכו')" },
-      { en: "<b>Restock:</b> fill up the coffee cups", he: "<b>מלאים:</b> למלא כוסות קפה" },
-      { only: "weizman", en: "<b>Clean the cashier area</b> - spray on the glass, lift things and clean underneath if needed, wet wipe on the receipt printer", he: "<b>ניקוי אזור קופה</b> - שפריצר על זכוכית, אם צריך להרים ולנקות מתחת, מגבון על מדפסת בונים" },
-      { en: "<b>Clean the blender:</b> check the blender jug is clean - if not, wash it with a scrubber and soap. Clean the blender body with a wet wipe, both the outside and where the jug sits.", he: "<b>ניקוי בלנדר:</b> וידוא ניקיון כד של בלנדר - אם לא נקי לשטוף עם סקוץ וסבון. לנקות גוף בלנדר עם מגבון, גם הבחוץ וגם האיזור איפה שיושב הכד." },
-      { en: "<b>Put away:</b> when everything is clean, put everything that was washed back in its place - mats, pitchers, cup with spoon, rail etc. Put the clean, taken-apart group heads on the rail.", he: "<b>סידור:</b> כשהכל נקי להחזיר את כל מה שנשטף למקומו - שטיחים, כדים, כוס עם כף, מסילה וכו'. להניח ראשים נקיים ומפורקים על המסילה." },
-      { en: "<b>Sink:</b> scrubber with soap inside the sink, around it and on the tap itself. Wipe the tap and around the sink so it shines, and clear any leftovers and dirt out of the sink. If it still doesn't shine, use a scrubber and degreaser.", he: "<b>כיור:</b> סקוץ עם סבון בתוך הכיור ומסביבו ועל הברז עצמו. ניגוב ברז ומסביב לכיור שיהיה מבריק, ופינוי שאריות ולכלוכים מתוך הכיור. אם עדיין לא מבריק, לעשות סקוץ ומסיר שומנים." },
-      { en: "<b>Final check:</b> go around and make sure everything is clean and back in its place.", he: "<b>סגירת פינות:</b> לעבור ולוודא שהכל נקי וחזר למקומו." }
+      { en: "<b>At closing:</b> close the remaining heads the same way.", he: "<b>כשסוגרים:</b> לסגור את שאר הראשים באותה דרך." },
+      { en: "<b>Grinder:</b>", he: "<b>מטחנה:</b>",
+        sub: [
+          { en: "Close the slide. Empty the hopper into an empty coffee bag and seal it with stickers.", he: "לסגור את הלשון. לרוקן את הכד לשקית קפה ריקה ולסגור במדבקות." },
+          { en: "Wipe the hopper with dry paper, put it back, and put the sealed bag inside it.", he: "לנגב את הכד בנייר יבש, להחזיר, ולהניח בתוכו את השקית הסגורה." },
+          { en: "Clean off all the coffee crumbs, including the part that holds the scoop.", he: "לנקות את כל פירורי הקפה, כולל החלק שמחזיק את הכף." }
+        ] },
+      { en: "<b>Into the fridge:</b>", he: "<b>לקירור:</b>",
+        groups: [ { label: { en: "Put away", he: "להכניס" }, chips: [{ en: "Milks", he: "חלבים" }, { en: "Iced tea", he: "תה קר" }, { en: "Syrups", he: "סירופים" }, { en: "Garnishes", he: "גרנישים" }] } ] },
+      { en: "<b>To washing:</b>", he: "<b>לשטיפה:</b>",
+        groups: [ { label: { en: "Send", he: "לשלוח" }, chips: [{ en: "Milk pitchers", he: "כדי חלב" }, { en: "Rubber mats", he: "שטיחי גומי" }, { en: "Ice scoops", he: "כפות קרח" }, { en: "Coffee bin", he: "פח קפה" }, { en: "Foam cup and spoon", he: "כוס וכף קצף" }, { en: "פס בונים", he: "פס בונים" }] } ],
+        sub: [
+          { en: "Group heads: take apart and wash by hand with a scrubber and soap.", he: "ראשים: לפרק ולשטוף ידנית עם סקוץ וסבון." },
+          { en: "Drip rail: carefully, so it doesn't spill.", he: "מסילת ניקוז: בזהירות שלא ישפך." }
+        ] },
+      { en: "<b>Steam wands:</b>", he: "<b>סטימרים:</b>",
+        sub: [
+          { en: "A cup of water with a capful of the blue steam wand cleaner.", he: "כוס מים עם פקק חומר כחול של סטימרים." },
+          { en: "Put the wand in the cup and open and close it in pulses, 10 times.", he: "להכניס את הסטימר לכוס ולפתוח ולסגור בפולסים 10 פעמים." },
+          { en: "Leave it to soak for about 10 minutes.", he: "להשרות כ-10 דקות." },
+          { en: "Wipe off the dried milk with a clean cloth, also under the rubber grip. Clean the bottom tip well.", he: "לנגב בסמרטוט נקי משאריות חלב יבש, גם מתחת לגומי האחיזה. לנקות היטב את הקצה התחתון." }
+        ] },
+      { en: "<b>Deep clean:</b> scrubber and soap under and around the machine and on it: front, behind the heads, sides, top (where there are no cups), steam wand handle. Squeegee, then dry paper. Marks on the stainless steel: blue spray and paper until it shines.", he: "<b>ניקוי יסודי:</b> סקוץ׳ וסבון מתחת ומסביב למכונה ועליה: קדמה, מאחורי הראשים, צדדים, למעלה (איפה שאין כוסות), ידית הסטימר. מגב ואז נייר יבש. סימנים על הנירוסטה: ספריי כחול ונייר עד שמבריק.",
+        add: { weizman: { en: "Go out from behind the bar and clean the counter and the back of the machine from outside.", he: "לצאת מהבר ולנקות את השיש והגב של מכונת הקפה מבחוץ." } } },
+      { en: "<b>Cupboards:</b> scrubber and soap on the cupboards around the coffee machine and on the ice machine. Wipe with paper until clean. Clean the milk drawers.", he: "<b>ארונות:</b> סקוץ וסבון על הארונות סביב מכונת הקפה ועל מכונת הקרח. לנגב בנייר עד שנקי. לנקות את מגירות החלב.",
+        add: { weizman: { en: "Scrub the top of the ice machine, under the counter.", he: "לנקות עם סקוץ את הגג של מכונת הקרח, מתחת לשיש." },
+               k135: { en: "Go over the outside of the dishwasher.", he: "לעבור על חוץ המדיח." } } },
+      { en: "<b>Condiment station (צ׳קר):</b> wipe the surface, clean the cinnamon shaker and the honey lid. Refill straws, stirrers etc.", he: "<b>צ׳קר:</b> לנגב משטח, לנקות כלי קינמון ומכסה דבש. למלא קשים, בוחשנים וכו׳." },
+      { en: "<b>Coffee cups:</b> refill.", he: "<b>כוסות קפה:</b> למלא." },
+      { only: "weizman", en: "<b>Cashier area:</b> spray the glass, lift and clean underneath if needed, wet wipe on the receipt printer.", he: "<b>אזור קופה:</b> שפריצר על הזכוכית, להרים ולנקות מתחת אם צריך, מגבון על מדפסת הבונים." },
+      { en: "<b>Blender:</b> jug not clean? Wash it with a scrubber and soap. Wet wipe on the body and where the jug sits.", he: "<b>בלנדר:</b> הכד לא נקי? לשטוף עם סקוץ וסבון. מגבון על גוף הבלנדר ואיפה שהכד יושב." },
+      { en: "<b>Put away:</b> everything back from washing (mats, pitchers, cup and spoon, rail etc.). Clean, taken-apart heads on the rail.", he: "<b>סידור:</b> להחזיר הכל מהשטיפה (שטיחים, כדים, כוס וכף, מסילה וכו׳). ראשים נקיים ומפורקים על המסילה." },
+      { en: "<b>Sink:</b> scrubber and soap in and around the sink and on the tap. Wipe until it shines and clear out any leftovers. Still not shining? Scrubber and degreaser.", he: "<b>כיור:</b> סקוץ וסבון בכיור, מסביב ועל הברז. לנגב שיבריק ולפנות שאריות. עדיין לא מבריק? סקוץ ומסיר שומנים." },
+      { en: "<b>Final check:</b> everything clean and back in its place.", he: "<b>סגירת פינות:</b> לעבור ולוודא שהכל נקי ובמקום." }
     ] },
   { title: { en: "Outside", he: "חוץ" },
     items: [
-      { en: "<b>Sugar station:</b> take the big container out from the bin's hiding place and move everything into it (lids, sugars, napkins, all of it), and put it inside. Make sure the sugar station is full, clean and ready for tomorrow. Clean the station with spray and paper, including the bin shaft. Bring in the water cups and wet wipes. Take out the chains and lock the station.", he: "<b>עמדת סוכרים:</b> להוציא ממחבוא הפח את הכלי הגדול ולהעביר אליו את כל הכלים (מכסים סוכרים מפיות הכל), ולהניח בפנים. לוודא שעמדת סוכרים מלאה, נקייה ומוכנה למחר. לנקות את העמדה עם שפריצר ונייר, כולל הפיר של הפח. להכניס כוסות מים ומגבונים. להוציא שרשראות ולנעול את העמדה." },
-      { en: "<b>Clean the tables:</b> clear all the tables and wipe them with a wet wipe.", he: "<b>ניקוי שולחנות:</b> פינוי כל השולחנות וניגוב עם מגבון." },
-      { en: "<b>Fold the seating:</b> fold the tables and chairs and put them neatly in their place", he: "<b>קיפול ישיבה:</b> קיפול שולחנות וכיסאות והנחתם באופן מסודר במקום" },
-      { en: "Tie the tables and chairs together with the chains and lock them.", he: "לקשור את השולחנות והכיסאות עם השרשראות ולנעול." },
-      { en: "<b>Bring in the heaters/fans:</b> unplug them and bring them inside", he: "<b>הכנסת תנורים/מאווררים:</b> ניתוק מהחשמל והכנסה פנימה" },
-      { only: "weizman", en: "<b>Awnings:</b> fold the awnings and turn off the ceiling fans", he: "<b>מרקיזות:</b> קיפול המרקיזות וכיבוי מאווררי תקרה" },
-      { en: "<b>Turn off the music:</b> and put the phone on charge", he: "<b>כיבוי מוזיקה:</b> ולשים טלפון בטעינה" },
-      { en: "Make sure the iPad is charging", he: "לוודא שהאייפד בטעינה" }
+      { en: "<b>Sugar station:</b>", he: "<b>עמדת סוכרים:</b>",
+        sub: [
+          { en: "Take the big container out of the bin's hiding place, put everything in it (lids, sugars, napkins) and bring it inside.", he: "להוציא את הכלי הגדול ממחבוא הפח, להעביר אליו הכל (מכסים, סוכרים, מפיות) ולהכניס פנימה." },
+          { en: "Make sure it's full, clean and ready for tomorrow.", he: "לוודא שהעמדה מלאה, נקייה ומוכנה למחר." },
+          { en: "Spray and paper on the station, including the bin shaft.", he: "שפריצר ונייר על העמדה, כולל הפיר של הפח." },
+          { en: "Bring in the water cups and wet wipes.", he: "להכניס כוסות מים ומגבונים." },
+          { en: "Lock the station with the chains.", he: "לנעול את העמדה עם השרשראות." }
+        ] },
+      { en: "<b>Tables:</b> clear them and wipe with a wet wipe.", he: "<b>שולחנות:</b> לפנות ולנגב עם מגבון." },
+      { en: "<b>Seating:</b> fold the tables and chairs and put them neatly in place.", he: "<b>ישיבה:</b> לקפל שולחנות וכיסאות ולסדר במקום." },
+      { en: "<b>Chains:</b> tie the tables and chairs together and lock.", he: "<b>שרשראות:</b> לקשור את השולחנות והכיסאות ולנעול." },
+      { en: "<b>Heaters/fans:</b> unplug and bring inside.", he: "<b>תנורים/מאווררים:</b> לנתק מהחשמל ולהכניס פנימה." },
+      { only: "weizman", en: "<b>Awnings:</b> fold them and turn off the ceiling fans.", he: "<b>מרקיזות:</b> לקפל ולכבות מאווררי תקרה." },
+      { en: "<b>Music:</b> turn it off.", he: "<b>מוזיקה:</b> לכבות." }
     ] },
   { title: { en: "Closing the register", he: "סגירת קופה" },
     items: [
-      { en: "<b>Close tables:</b> close all the tables that are still open (delete them or settle the payment)", he: "<b>לסגור שולחנות:</b> לסגור את כל השולחנות שנותרו פתוחים (למחוק או להסדיר תשלום)" },
-      { en: "<b>Print reports:</b> waste, sales - in the sales report, tap food and then twice on \"item\" - make sure it's sorted alphabetically, then print the staff and managers table bill (1000+2000) - make sure everything eaten today was entered, and only then print the bill and close the table. Take photos of all the reports", he: "<b>להדפיס דוחות:</b> פחת מכירות - כשמגיעים לדוח מכירות, ללחוץ על אוכל ואז פעמיים על \"פריט\" - לשים לב שמסודר לפי א' ב' ואז להדפיס חשבון שולחן עובדים ומנהלים (1000+2000) - לוודא שכל מה שנאכל היום הוקלד ורק אז להדפיס חשבון ולסגור שולחן. לצלם את כל הדוחות" },
-      { en: "<b>Produce the Z report:</b> the button at the top right (☰) → ניהול קופה → Z סוף יום. At the bottom of this screen there are two checkboxes: the lower one will be ticked and the upper one not - swap them! Tick \"כן אני מבין\" (yes, I understand) and untick the one that clocks the staff out of the shift.", he: "<b>להפיק דוח Z:</b> בכפתור בצד ימין למעלה (☰) ← ניהול קופה ← Z סוף יום. במסך הזה למטה יש שני צ'קבוקסים, התחתון יהיה מסומן והעליון לא - להחליף את זה! לסמן את \"כן אני מבין\" ולהוריד סימון מלהוציא את העובדים ממשמרת." },
-      { en: "<b>Count the cash:</b> near the bottom of the report, under \"פירוט סוגי תשלומים\" (payment types), the last line is \"סה\"כ מזומן\" (total cash) - take exactly that amount out of the register, in the largest notes possible, and use agorot too if there are any.", he: "<b>ספירת מזומן:</b> קרוב לתחתית הדוח תחת \"פירוט סוגי תשלומים\", השורה האחרונה היא \"סה\"כ מזומן\" - להוציא את המספר שכתוב שם בדיוק מהקופה בשטרות גדולים ככל האפשר, ואם יש להשתמש גם באגורות." },
-      { en: "<b>Deposit bag (ממסרון):</b> take out a Bank Hapoalim deposit bag and scan the QR code on it. The Bank Hapoalim site opens and asks for a phone number and ID number; the details are inside the register. Enter the details, and a code arrives on the music phone. Enter the code and tap continue twice. Enter exactly the cash we counted; every note or coin entered goes straight into the bag. At the end, look at the top and check the number matches the total cash in the Z report. Tap save on the site twice and make sure we reach the home page and the bag we entered is saved. Pull off the silver strip at the top of the bag and seal it straight.", he: "<b>ממסרון:</b> להוציא שקית ממסרון של בנק הפועלים, ולסרוק את ה QR קוד שיש עליה. יפתח האתר של בנק הפועלים שיבקש מס' טלפון ותעודת זהות, הפרטים נמצאים בתוך הקופה. מזינים את הפרטים, ואז יתקבל קוד בטלפון של המוזיקה. מזינים את הקוד ולוחצים המשך פעמיים. להזין במדויק את הכסף שספרנו, כשכל שטר או מטבע שהזנו מיד יוכנס לתוך השקית. בסוף להסתכל למעלה ולוודא שהמספר תואם את הסה\"כ מזומן בדוח Z. ללחוץ באתר שמור פעמיים ולוודא שהגענו לדף בית והשקית שהכנסנו שמורה. להוציא את הפס הכסוף בראש השקית ולהדביק ישר." },
-      { en: "<b>Pay attention ♥!</b> The bag can't be opened once it's sealed! So before sealing, check twice that everything is right. Staple the Z report to the outside of the deposit bag.", he: "<b>שימו ♥!</b> אי אפשר לפתוח את השקית אחרי שהיא נסגרה! אז לפני שסוגרים לוודא פעמיים שהכל כמו שצריך. לשדך את הדוח Z לחוץ שקית הממסרון." },
-      { en: "<b>Count the float:</b> count all the money left in the register. Separate each kind of note and coin into closed panini bags, and write on each bag how much money is inside. Make sure the total comes to exactly 1000 ₪. Staple the bags together and put them in the Mizrahi bag. If it doesn't come to 1000 ₪ - if there's extra, put the extra amount in an envelope and write the date, your name and the amount on it. Whenever it doesn't match, note it in the closing report. Put the envelope with the extra in the safe, separately from the float. Put the float, the deposit bag and the extra (if any) in the safe.", he: "<b>ספירת קרן:</b> לספור את כל הכסף שנותר בקופה. להפריד כל סוג שטר ומטבע בשקיות פניני סגורות, ולרשום על כל שקית כמה כסף יש בפנים. לוודא שהסה\"כ יוצא 1000 ש\"ח בדיוק. לשדך את השקיות ולשים בתיק מזרחי. אם לא יוצא 1000 ש\"ח - במקרה של עודף להפריד את הסכום הנותר במעטפה, ולרשום עליה תאריך, שם וסכום. בכל מקרה של אי התאמה לעדכן בדוח סגירה. את המעטפה עם העודף לשים בכספת בנפרד מהקרן. לשים בכספת את הקרן, הממסרון והעודף אם יש." },
-      { en: "<b>Tidy up:</b> make sure the station is tidy and clean, with everything in its place.", he: "<b>סידור:</b> לוודא סדר וניקיון עמדה, שהכל במקום." },
-      { en: "Put all the buzzers on charge.", he: "לשים את כל הזמזמים בטעינה." },
-      { en: "Put the phone and iPad on charge", he: "לשים טלפון ואייפד בטעינה" }
+      { en: "<b>Open tables:</b> close them all (delete or settle the payment).", he: "<b>שולחנות פתוחים:</b> לסגור את כולם (למחוק או להסדיר תשלום)." },
+      { en: "<b>Print reports:</b>", he: "<b>להדפיס דוחות:</b>",
+        sub: [
+          { en: "Waste", he: "פחת" },
+          { en: "Sales: tap food, then \"item\" twice, so it's sorted alphabetically.", he: "מכירות: ללחוץ על אוכל ואז פעמיים על \"פריט\", שיהיה מסודר לפי א׳-ב׳." },
+          { en: "Staff and managers table bill (1000+2000): first make sure everything eaten today was entered, then print and close the table.", he: "חשבון שולחן עובדים ומנהלים (1000+2000): קודם לוודא שכל מה שנאכל היום הוקלד, ואז להדפיס ולסגור שולחן." },
+          { en: "Take photos of all the reports.", he: "לצלם את כל הדוחות." }
+        ] },
+      { en: "<b>Z report:</b>", he: "<b>דוח Z:</b>",
+        sub: [
+          { en: "Top-right button (☰) → ניהול קופה → Z סוף יום.", he: "כפתור למעלה מימין (☰) ← ניהול קופה ← Z סוף יום." },
+          { en: "At the bottom there are two checkboxes: the lower one is ticked, the upper one isn't. Swap them!", he: "למטה יש שני צ׳קבוקסים: התחתון מסומן והעליון לא. להחליף!" },
+          { en: "Tick \"כן אני מבין\" (yes, I understand), and untick clocking the staff out of the shift.", he: "לסמן \"כן אני מבין\", ולהוריד את הסימון מלהוציא את העובדים ממשמרת." }
+        ] },
+      { en: "<b>Cash:</b> in the report, under \"פירוט סוגי תשלומים\", the last line is \"סה״כ מזומן\". Take exactly that amount out of the register, in the largest notes possible (agorot too, if any).", he: "<b>מזומן:</b> בדוח, תחת \"פירוט סוגי תשלומים\", השורה האחרונה היא \"סה״כ מזומן\". להוציא בדיוק את הסכום הזה מהקופה, בשטרות הכי גדולים (גם אגורות אם יש)." },
+      { en: "<b>Deposit bag (ממסרון), Bank Hapoalim:</b>", he: "<b>ממסרון של בנק הפועלים:</b>",
+        sub: [
+          { en: "Scan the QR code on the bag.", he: "לסרוק את קוד ה-QR שעל השקית." },
+          { en: "Enter the phone and ID numbers (the details are in the register), then the code sent to the music phone. Tap continue twice.", he: "להזין מס׳ טלפון ות״ז (הפרטים בתוך הקופה), ואז את הקוד שמגיע לטלפון של המוזיקה. ללחוץ המשך פעמיים." },
+          { en: "Enter exactly the cash you counted. Each note or coin goes into the bag as soon as you enter it.", he: "להזין בדיוק את הכסף שספרנו. כל שטר או מטבע שהוזן נכנס מיד לשקית." },
+          { en: "Check the total at the top matches \"סה״כ מזומן\" in the Z report.", he: "לוודא שהסכום למעלה תואם ל\"סה״כ מזומן\" בדוח Z." },
+          { en: "Tap save twice and check you're back on the home page and the bag is saved.", he: "ללחוץ שמור פעמיים ולוודא שחזרנו לדף הבית והשקית שמורה." },
+          { en: "Peel off the silver strip at the top and seal the bag straight.", he: "להוריד את הפס הכסוף בראש השקית ולהדביק ישר." }
+        ] },
+      { en: "<b>Pay attention ♥!</b> The bag can't be opened once it's sealed. Check twice before sealing. Staple the Z report to the outside of the bag.", he: "<b>שימו ♥!</b> אי אפשר לפתוח את השקית אחרי שנסגרה. לבדוק פעמיים לפני שסוגרים. לשדך את דוח Z לשקית מבחוץ." },
+      { en: "<b>Count the float:</b>", he: "<b>ספירת קרן:</b>",
+        sub: [
+          { en: "Count the money left in the register. Each kind of note and coin in its own closed panini bag, with the amount written on it.", he: "לספור את הכסף שנשאר בקופה. כל סוג שטר ומטבע בשקית פניני סגורה, עם הסכום כתוב עליה." },
+          { en: "It must come to exactly ₪1,000. Staple the bags together and put them in the Mizrahi bag.", he: "הסה״כ חייב לצאת 1,000 ש״ח בדיוק. לשדך את השקיות ולשים בתיק מזרחי." },
+          { en: "Extra money: in an envelope with the date, your name and the amount.", he: "עודף: במעטפה, עם תאריך, שם וסכום." },
+          { en: "Any mismatch: note it in the closing report.", he: "כל אי התאמה: לעדכן בדוח סגירה." },
+          { en: "Into the safe: the float, the deposit bag, and the extra envelope (separate from the float).", he: "לכספת: הקרן, הממסרון, והמעטפה עם העודף (בנפרד מהקרן)." }
+        ] },
+      { en: "<b>Tidy up:</b> the station clean and tidy, everything in its place.", he: "<b>סידור:</b> עמדה נקייה ומסודרת, הכל במקום." },
+      { en: "<b>Charging:</b> all the buzzers, the phone and the iPad.", he: "<b>טעינה:</b> כל הזמזמים, הטלפון והאייפד." }
     ] }
 ];
 const forBranch = (phases, br) => phases.map(ph => ({ ...ph, items: ph.items
@@ -689,13 +758,6 @@ const BRANCH_TEMPLATE = () => ({
   address: TODO("Add address", "להוסיף כתובת"),
   hours: TODO("Add opening hours", "להוסיף שעות פתיחה"),
   manager: TODO("Add name and phone", "להוסיף שם וטלפון"),
-  opening: [
-    { en: "Turn on the espresso machine at least 30 minutes before opening.", he: "להדליק את מכונת האספרסו לפחות 30 דקות לפני הפתיחה." },
-    { en: "Pull a test shot and check the timing (25–30 s).", he: "למצות אספרסו לבדיקה ולבדוק את הזמן (25–30 שנ')." },
-    { en: "Stock milk, cups and lids.", he: "להשלים חלב, כוסות ומכסים." },
-    { en: "Count the cash drawer.", he: "לספור את הקופה." },
-    TODO("Add steps that are specific to this branch", "להוסיף שלבים שמיוחדים לסניף")
-  ],
   special: [
     TODO("For example: seating area, delivery times, alarm code location", "לדוגמה: אזור ישיבה, שעות משלוחים, איפה קוד האזעקה")
   ]
@@ -841,14 +903,36 @@ function renderBaking() {
     </div>`;
 }
 
-function renderPhases(phases) {
-  const count = (n) => n === 1 ? t(UI.task) : `${n} ${t(UI.tasks)}`;
+// Ticks are saved on this device and cleared each new day.
+function ticks() {
+  const today = new Date().toDateString();
+  const v = store.get("ticks", null);
+  return v && v.day === today ? v : { day: today, done: [] };
+}
+function setTick(key, on) {
+  const v = ticks();
+  v.done = v.done.filter(k => k !== key);
+  if (on) v.done.push(key);
+  store.set("ticks", v);
+}
+function updateCount(details) {
+  const boxes = [...details.querySelectorAll("input[data-tick]")];
+  const done = boxes.filter(b => b.checked).length;
+  const c = details.querySelector(".count");
+  c.innerHTML = `<bdi dir="ltr">${done}/${boxes.length}</bdi>`;
+  c.classList.toggle("all", done === boxes.length);
+}
+
+function renderPhases(phases, id) {
+  const done = ticks().done;
   const rule = (r) => `<div class="rule">${r.en ? `<span>${t(r)}:</span>` : ""}
     <span class="chip"><b>${t(r.a)}</b> = ${t(UI.older)}</span><span class="chip ghost"><b>${t(r.b)}</b> = ${t(UI.newer)}</span></div>`;
-  return `<ol class="phases">${phases.map(ph => `<li><details>
-    <summary><h4>${t(ph.title)}${ph.fifo ? ` <span class="tag">FIFO</span>` : ""}</h4><span class="count">${count(ph.items.filter(x => !x.rule).length)}</span></summary>
+  const task = (x, key) => `<li class="task"><input type="checkbox" id="t-${key}" data-tick="${key}" ${done.includes(key) ? "checked" : ""}><div>
+    <label for="t-${key}">${txt(x)}</label>${x.groups ? `<dl class="pick">${x.groups.map(g => `<dt>${t(g.label)}</dt><dd>${g.chips.map(c => `<span class="chip ghost">${t(c)}</span>`).join("")}</dd>`).join("")}</dl>` : ""}${x.sub ? `<ul class="sub">${x.sub.map(s => `<li>${txt(s)}</li>`).join("")}</ul>` : ""}</div></li>`;
+  return `<ol class="phases">${phases.map((ph, p) => `<li><details>
+    <summary><h4>${t(ph.title)}${ph.fifo ? ` <span class="tag">FIFO</span>` : ""}</h4><span class="count"></span></summary>
     <div class="phase-body">
-    <ul class="checks">${ph.items.map(x => x.rule ? `<li class="plain">${rule(x)}</li>` : `<li>${txt(x)}${x.groups ? `<dl class="pick">${x.groups.map(g => `<dt>${t(g.label)}</dt><dd>${g.chips.map(c => `<span class="chip ghost">${t(c)}</span>`).join("")}</dd>`).join("")}</dl>` : ""}${x.sub ? `<ul class="sub">${x.sub.map(s => `<li>${txt(s)}</li>`).join("")}</ul>` : ""}</li>`).join("")}</ul>
+    <ul class="tasks">${ph.items.map((x, i) => x.rule ? `<li>${rule(x)}</li>` : task(x, `${id}.${p}.${i}`)).join("")}</ul>
     ${ph.fifo ? `<p class="small">${t(UI.fifo)}</p>` : ""}
     ${ph.bake ? bakeTable() + `<button class="btn ghost sm" data-view="baking">${t(UI.seeBaking)}</button>` : ""}
     </div>
@@ -860,7 +944,9 @@ function renderBranches() {
   const pick = BRANCHES.map((x, i) =>
     `<button class="btn ${i === S.branch ? "" : "ghost"}" data-branch="${i}" aria-pressed="${i === S.branch}">${t(x.name)}</button>`).join("");
   const ul = (arr, tag = "ul") => `<${tag} class="checks">${arr.map(x => `<li>${txt(x)}</li>`).join("")}</${tag}>`;
-  const routine = (arr) => arr[0] && arr[0].items ? renderPhases(arr) : ul(arr, "ol");
+  const routine = (title, arr, id) => `<section class="card wide" data-routine="${id}">
+    <div class="card-head routine"><h3>${t(title)}</h3><button class="btn ghost sm" data-clear="${id}">${t(UI.clearTicks)}</button></div>
+    ${renderPhases(arr, id)}</section>`;
   app.innerHTML = `
     <p class="note">${t(UI.branchNote)}</p>
     <div class="branch-pick">${pick}</div>
@@ -873,9 +959,10 @@ function renderBranches() {
         </dl>
       </section>
       <section class="card"><h3>${t(UI.special)}</h3>${ul(b.special)}</section>
-      <section class="card wide"><h3>${t(UI.opening)}</h3>${routine(b.opening)}</section>
-      <section class="card wide"><h3>${t(UI.closing)}</h3>${routine(b.closing)}</section>
+      ${routine(UI.opening, b.opening, `b${S.branch}.open`)}
+      ${routine(UI.closing, b.closing, `b${S.branch}.close`)}
     </div>`;
+  app.querySelectorAll(".phases details").forEach(updateCount);
 }
 
 function render() {
@@ -885,9 +972,22 @@ function render() {
   else renderDrinks();
 }
 
+document.addEventListener("change", (e) => {
+  const box = e.target.closest("input[data-tick]");
+  if (!box) return;
+  setTick(box.dataset.tick, box.checked);
+  updateCount(box.closest("details"));
+});
+
 document.addEventListener("click", (e) => {
   const el = e.target.closest("button");
   if (!el) return;
+  if (el.dataset.clear) {
+    const card = el.closest("[data-routine]");
+    card.querySelectorAll("input[data-tick]:checked").forEach(b => { b.checked = false; setTick(b.dataset.tick, false); });
+    card.querySelectorAll(".phases details").forEach(updateCount);
+    return;
+  }
   if (el.id === "lang") S.lang = S.lang === "he" ? "en" : "he";
   else if (el.dataset.view) S.view = el.dataset.view;
   else if (el.dataset.drink) { S.drink = el.dataset.drink; S.step = 0; }
