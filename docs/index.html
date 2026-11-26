@@ -529,7 +529,7 @@ const CASHIER = { title: { en: "Cashier", he: "קופה" },
       ] }
   ] };
 
-// Same at Katzenelson 50 and Weizman.
+// Same in all three branches.
 const COFFEE = { title: { en: "Coffee station", he: "עמדת קפה" },
     items: [
       { en: "<b>Group heads.</b> Pull two double shots from each group head.", he: "<b>ראשים.</b> להוריד שתי מנות כפולות מכל ראש." },
@@ -607,6 +607,12 @@ const OPENING_K50 = [
   SEATING,
   CASHIER
 ];
+
+// Same as Katzenelson 50, except the oven step (Tecnoeka, see STEPS_135).
+const OPENING_K135 = OPENING_K50.map(ph => !ph.bake ? ph : { ...ph, items: [
+  { en: "Turn on the oven: left knob to ∞, right knob to about 170°C. Wait about 5 minutes, until the orange light goes off.", he: "להדליק את התנור: כפתור שמאלי ל-∞, כפתור ימני לכ-170°C. לחכות כ-5 דקות, עד שהנורה הכתומה נכבית." },
+  ...ph.items.slice(1)
+] });
 const BRANCH_TEMPLATE = () => ({
   address: TODO("Add address", "להוסיף כתובת"),
   hours: TODO("Add opening hours", "להוסיף שעות פתיחה"),
@@ -644,10 +650,7 @@ const BRANCHES = [
       { day: { en: "Sat", he: "שבת" }, time: "08:00–15:00" }
     ] },
   { name: { en: "Katzenelson 135", he: "כצנלסון 135" }, ...BRANCH_TEMPLATE(),
-    opening: [
-      { title: { en: "Before the seating area", he: "לפני אזור הישיבה" }, items: [ TODO("Steps for this branch to be added", "השלבים של הסניף יתווספו בהמשך") ] },
-      SEATING
-    ],
+    opening: OPENING_K135,
     address: { en: "Katzenelson 135, Givatayim", he: "כצנלסון 135, גבעתיים" },
     hours: [
       { day: { en: "Sun–Thu", he: "א׳–ה׳" }, time: "07:30–19:00" },
